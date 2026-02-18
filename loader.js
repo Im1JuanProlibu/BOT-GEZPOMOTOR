@@ -7,5 +7,5 @@ if (window.location.href.indexOf('/edit/') === -1) {
         document.write(html);
         document.close();
       });
-  }, 60000); // 30 segundos
+  }, 60000); // espera 1 minuto antes de ejecutar
 }
