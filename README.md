@@ -42,12 +42,120 @@ Esto se configura **una sola vez** y nunca más se toca.
 <script src="https://{usuario}.github.io/{repo}/loader.js"></script>
 ```
 
+**Ejemplo real (Gezpomotor):**
+```html
+<div id="bot-gezpomotor">Cargando...</div>
+<script src="https://im1juanprolibu.github.io/BOT-GEZPOMOTOR/loader.js"></script>
+```
+
+> El `id` del `<div>` debe coincidir exactamente con el ID que está hardcodeado en el `loader.js` (`document.getElementById('bot-gezpomotor')`). Si no coinciden, el bot no se inyecta.
+
 **Pasos para pegarlo:**
 1. Abrir el editor HTML del bot en Prolibu
 2. Cambiar a vista código `< >`
 3. `Ctrl + A` → borrar todo
 4. Pegar las 2 líneas de arriba
-5. Dar OK **sin** cambiar a vista visual (si se cambia a visual, la plataforma rompe el código)
+5. Dar OK **sin** cambiar a vista visual (si se cambia a vista visual, la plataforma ejecuta el script y rompe el código)
+
+---
+
+## Estructura del loader.js
+
+El `loader.js` es el script intermediario. Es el único archivo que la plataforma carga directamente. Su trabajo es buscar el bot en GitHub e inyectarlo en la página.
+
+**Las dos únicas cosas que cambian por cliente:**
+
+```js
+// 1. URL del archivo HTML del bot en GitHub (cambiar por cliente)
+var REPO_RAW = 'https://raw.githubusercontent.com/{usuario}/{repo}/main/{cliente}-bot.html';
+
+// 2. ID del contenedor donde se inyecta el bot (debe coincidir con el <div> del editor)
+var container = document.getElementById('bot-{cliente}');
+```
+
+**Flujo interno paso a paso:**
+
+```
+1. fetch(REPO_RAW + '?t=' + Date.now())
+       ↓  fuerza descarga fresca (sin caché)
+2. Parsea el HTML en un <div> temporal
+       ↓
+3. Separa los <script src="..."> externos del código JS inline
+       ↓
+4. Inyecta el HTML del formulario en #bot-{cliente}
+       ↓
+5. loadInOrder() → carga los scripts externos UNO POR UNO en orden
+       ↓  (jQuery → Nodriza SDK → Lodash → Select2 → intl-tel-input)
+6. Cuando todos están listos → ejecuta el código JS inline del bot
+       ↓
+7. Verifica en consola que jQuery, Nodriza, productsList y agentsList existan
+```
+
+> **¿Por qué carga secuencial y no paralela?** Si los scripts cargan en paralelo, el código del bot se ejecuta antes de que jQuery o Nodriza SDK estén disponibles, causando errores como `jQuery is not defined`. La carga en orden garantiza las dependencias.
+
+**Código completo del loader.js:**
+
+```js
+(function () {
+  console.log('🚀 [LOADER] Iniciando...');
+
+  // ⬇️ CAMBIAR ESTO POR CLIENTE
+  var REPO_RAW = 'https://raw.githubusercontent.com/{usuario}/{repo}/main/{cliente}-bot.html';
+  var URL = REPO_RAW + '?t=' + Date.now();
+
+  function loadScript(src, cb) {
+    var s = document.createElement('script');
+    s.src = src;
+    s.onload = function () { cb(); };
+    s.onerror = function () { cb(); }; // error no bloquea la cadena
+    document.body.appendChild(s);
+  }
+
+  function loadInOrder(srcs, cb) {
+    if (!srcs.length) return cb();
+    loadScript(srcs[0], function () { loadInOrder(srcs.slice(1), cb); });
+  }
+
+  fetch(URL)
+    .then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
+    .then(function (html) {
+      var tmp = document.createElement('div');
+      tmp.innerHTML = html;
+
+      var srcs = [];
+      var inlineCode = '';
+
+      tmp.querySelectorAll('script').forEach(function (s) {
+        if (s.src) {
+          srcs.push(s.src);
+          s.parentNode.removeChild(s);
+        } else {
+          inlineCode += s.textContent;
+          s.parentNode.removeChild(s);
+        }
+      });
+
+      // ⬇️ CAMBIAR ESTO POR CLIENTE (debe coincidir con el id del <div> en el editor)
+      var container = document.getElementById('bot-{cliente}');
+      if (container) container.innerHTML = tmp.innerHTML;
+
+      loadInOrder(srcs, function () {
+        var sc = document.createElement('script');
+        sc.textContent = inlineCode;
+        document.body.appendChild(sc);
+        console.log('🎉 [LOADER] Bot completamente cargado.');
+      });
+    })
+    .catch(function (e) {
+      console.error('❌ [LOADER] Error:', e.message);
+      var container = document.getElementById('bot-{cliente}');
+      if (container) container.innerHTML = '<p style="color:red">Error cargando el bot: ' + e.message + '</p>';
+    });
+})();
+```
 
 ---
 
