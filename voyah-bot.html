@@ -1,935 +1,725 @@
 <title>Cotizador Voyah - GezpoMotor</title>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link rel="stylesheet" href="//s3.amazonaws.com/cdn.nodriza.io/assets/css/chatbot.automotriz.css">
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-<script src="https://s3.amazonaws.com/cdn.nodriza.io/sdk/nodriza@lastest/nodriza-sdk.bundle.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.core.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="//s3.amazonaws.com/cdn.nodriza.io/assets/css/chatbot.automotriz.css">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+  <script src="https://s3.amazonaws.com/cdn.nodriza.io/sdk/nodriza@lastest/nodriza-sdk.bundle.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.core.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 
 <style>
   :root {
-    --bg: #09090f;
-    --panel: #0f0f18;
-    --accent: #6c63ff;
-    --accent2: #a89cff;
-    --accentdim: rgba(108, 99, 255, 0.12);
-    --accentbrd: rgba(108, 99, 255, 0.25);
-    --white: #f0efff;
-    --muted: rgba(240, 239, 255, 0.4);
-    --inputbg: rgba(108, 99, 255, 0.04);
-    --inputbrd: rgba(108, 99, 255, 0.15);
-    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --voyah-black: #0a0a0a;
+    --voyah-dark: #111318;
+    --voyah-card: #16191f;
+    --voyah-gold: #c9a84c;
+    --voyah-gold-light: #e4c97a;
+    --voyah-gold-dim: rgba(201, 168, 76, 0.15);
+    --voyah-white: #f5f5f0;
+    --voyah-gray: #8a8a8a;
+    --voyah-border: rgba(201, 168, 76, 0.25);
+    --voyah-input-bg: rgba(255,255,255,0.04);
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
   #chatbot-automotriz * {
-    font-family: 'Outfit', sans-serif !important;
+    font-family: 'Montserrat', sans-serif !important;
   }
 
-  /* ══ CONTENEDOR PRINCIPAL — LAYOUT VERTICAL ══ */
   #chatbot-automotriz {
-    background: var(--bg);
-    min-height: 100vh;
-    display: flex !important;
-    flex-direction: column !important;
     overflow: visible;
+    background: var(--voyah-black);
+    min-height: 100vh;
   }
 
-  /* Ocultar el layout de columnas original */
-  #chatbot-automotriz>.row {
-    flex-direction: column !important;
-    margin: 0 !important;
+  /* ── LOGO MOBILE ── */
+  #logo-container {
+    background: var(--voyah-dark);
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--voyah-border);
+  }
+  #logo-container .brand-name {
+    font-family: 'Rajdhani', sans-serif !important;
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--voyah-gold) !important;
   }
 
-  /* ══ HERO — IMAGEN PANTALLA COMPLETA ══ */
-  #background {
-    width: 100% !important;
-    max-width: 100% !important;
-    flex: none !important;
-    height: 55vh !important;
-    min-height: 320px !important;
-    background-size: cover !important;
-    background-position: center 30% !important;
-    position: relative !important;
-    display: block !important;
+  /* ── IMAGEN MOBILE ── */
+  #image-selecte-mobile {
+    height: 240px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
   }
-
-  /* Overlay degradado hacia abajo */
-  #background::before {
+  #image-selecte-mobile::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom,
-        rgba(9, 9, 15, 0.1) 0%,
-        rgba(9, 9, 15, 0.2) 50%,
-        rgba(9, 9, 15, 0.95) 100%);
-    z-index: 1;
+    background: linear-gradient(to bottom, transparent 40%, var(--voyah-black) 100%);
   }
 
-  /* Texto sobre la imagen */
-  #background::after {
-    content: 'VOYAH × GEZPOMOTOR';
-    position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'Outfit', sans-serif;
-    font-size: clamp(1.8rem, 4vw, 3.2rem);
-    font-weight: 800;
-    letter-spacing: 0.15em;
-    color: rgba(255, 255, 255, 0.9);
-    text-transform: uppercase;
-    z-index: 2;
-    white-space: nowrap;
-    text-shadow: 0 2px 40px rgba(0, 0, 0, 0.8);
+  /* ── LAYOUT PRINCIPAL ── */
+  #chatbot-automotriz .row {
+    margin: 0 !important;
   }
 
-  /* ══ PANEL FORMULARIO HORIZONTAL ══ */
-  #contact-form {
-    width: 100% !important;
-    max-width: 100% !important;
-    flex: none !important;
-    background: var(--panel) !important;
-    border-top: 1px solid var(--accentbrd) !important;
-    padding: 0 !important;
+  /* ── FONDO IMAGEN ── */
+  #chatbot-automotriz #background {
+    background-position: center;
+    background-size: cover;
+    min-height: 100vh;
     position: relative;
   }
+  #chatbot-automotriz #background::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      rgba(10,10,10,0) 0%,
+      rgba(10,10,10,0.3) 60%,
+      rgba(10,10,10,0.85) 100%
+    );
+  }
 
-  /* Línea accent top */
+  /* ── PANEL FORMULARIO ── */
+  #contact-form {
+    background: var(--voyah-dark);
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    border-left: 1px solid var(--voyah-border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Línea decorativa dorada top */
   #contact-form::before {
     content: '';
     display: block;
     width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
-    flex-shrink: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--voyah-gold), transparent);
   }
 
   #info-container {
-    padding: 32px 40px 40px !important;
-    max-width: 1400px;
-    margin: 0 auto;
-    width: 100%;
+    padding: 32px 28px 40px;
+    flex: 1;
   }
 
-  /* ══ ENCABEZADO ══ */
-  .form-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 28px;
-    flex-wrap: wrap;
-    gap: 12px;
+  /* ── ENCABEZADO ── */
+  #info-container > .row:first-child {
+    margin-bottom: 28px !important;
   }
 
-  .form-header-left h3,
-  .form-header-left h5 {
+  #info-container h3,
+  #info-container h5 {
+    font-family: 'Rajdhani', sans-serif !important;
+    color: var(--voyah-white) !important;
     font-weight: 700 !important;
-    color: var(--white) !important;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
+    letter-spacing: 0.05em;
+    line-height: 1.3;
+    text-transform: uppercase;
   }
+  #info-container h3 { font-size: 1.15rem !important; }
+  #info-container h5 { font-size: 1rem !important; }
 
-  .form-header-left h3 {
-    font-size: 1.4rem !important;
-  }
-
-  .form-header-left h5 {
-    font-size: 1.1rem !important;
-  }
-
-  .form-header-left p {
-    color: var(--muted) !important;
-    font-size: 0.82rem !important;
-    margin-top: 4px;
-    font-weight: 400 !important;
-  }
-
-  .form-badge {
-    display: inline-flex;
+  /* ── ETIQUETAS DE SECCIÓN ── */
+  #info-container h4,
+  #info-container h6 {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 0.65rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--voyah-gold) !important;
+    margin-bottom: 8px !important;
+    margin-top: 18px !important;
+    display: flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 14px;
-    background: var(--accentdim);
-    border: 1px solid var(--accentbrd);
-    border-radius: 100px;
-    font-size: 0.72rem !important;
-    font-weight: 600 !important;
-    color: var(--accent2) !important;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
   }
-
-  .form-badge::before {
+  #info-container h4::after,
+  #info-container h6::after {
     content: '';
-    width: 7px;
-    height: 7px;
-    background: #00e5a0;
-    border-radius: 50%;
-    box-shadow: 0 0 8px #00e5a0;
-    animation: blink 2s infinite;
+    flex: 1;
+    height: 1px;
+    background: var(--voyah-border);
   }
 
-  /* ══ GRID HORIZONTAL DE CAMPOS ══ */
-  .fields-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 14px;
-  }
-
-  .fields-grid-3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 14px;
-  }
-
-  .fields-grid-5 {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 14px;
-  }
-
-  /* ══ FIELD GROUP ══ */
-  .field-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .field-label {
-    font-size: 0.62rem !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--accent2) !important;
-    opacity: 0.8;
-  }
-
-  /* ══ INPUTS ══ */
-  #contact-form .form-group {
-    margin-bottom: 0 !important;
-  }
-
+  /* ── INPUTS ── */
   #contact-form .form-control {
-    background: var(--inputbg) !important;
-    border: 1px solid var(--inputbrd) !important;
-    border-radius: 8px !important;
-    color: var(--white) !important;
-    font-size: 0.875rem !important;
-    font-weight: 400 !important;
-    padding: 11px 14px !important;
+    background: var(--voyah-input-bg) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 4px !important;
+    color: var(--voyah-white) !important;
+    font-size: 0.85rem !important;
+    padding: 10px 14px !important;
     height: auto !important;
-    transition: all 0.2s var(--ease) !important;
-    width: 100%;
-  }
-
-  #contact-form .form-control:focus {
-    border-color: var(--accent) !important;
-    background: rgba(108, 99, 255, 0.07) !important;
-    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1) !important;
+    transition: border-color var(--transition), background var(--transition) !important;
     outline: none !important;
   }
-
+  #contact-form .form-control:focus {
+    border-color: var(--voyah-gold) !important;
+    background: rgba(201, 168, 76, 0.06) !important;
+    box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1) !important;
+  }
   #contact-form .form-control::placeholder {
-    color: rgba(240, 239, 255, 0.2) !important;
-    font-weight: 300 !important;
+    color: rgba(255,255,255,0.25) !important;
+  }
+  #contact-form .form-group {
+    margin-bottom: 10px !important;
   }
 
-  /* ══ SELECT2 ══ */
+  /* ── SELECT2 ── */
   .select2-container--default .select2-selection--single {
-    background: var(--inputbg) !important;
-    border: 1px solid var(--inputbrd) !important;
-    border-radius: 8px !important;
-    height: 42px !important;
+    background: var(--voyah-input-bg) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 4px !important;
+    height: 40px !important;
     display: flex !important;
     align-items: center !important;
     padding-left: 14px !important;
-    transition: all 0.2s var(--ease) !important;
+    transition: border-color var(--transition) !important;
   }
-
+  .select2-container--default .select2-selection--single:hover {
+    border-color: var(--voyah-border) !important;
+  }
   .select2-container--default.select2-container--open .select2-selection--single {
-    border-color: var(--accent) !important;
-    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1) !important;
+    border-color: var(--voyah-gold) !important;
   }
-
   .select2-container--default .select2-selection--single .select2-selection__rendered {
-    color: var(--white) !important;
-    font-size: 0.875rem !important;
-    line-height: 42px !important;
-    padding: 0 !important;
+    color: var(--voyah-white) !important;
+    font-size: 0.85rem !important;
+    line-height: 40px !important;
+    padding-left: 0 !important;
   }
-
   .select2-container--default .select2-selection--single .select2-selection__placeholder {
-    color: rgba(240, 239, 255, 0.2) !important;
-    font-weight: 300 !important;
+    color: rgba(255,255,255,0.25) !important;
   }
-
   .select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 40px !important;
+    height: 38px !important;
     right: 10px !important;
   }
-
   .select2-container--default .select2-selection--single .select2-selection__arrow b {
-    border-color: rgba(108, 99, 255, 0.5) transparent transparent !important;
+    border-color: var(--voyah-gray) transparent transparent transparent !important;
   }
-
   .select2-dropdown {
-    background: #13131f !important;
-    border: 1px solid var(--accentbrd) !important;
-    border-radius: 8px !important;
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7) !important;
+    background: #1a1d24 !important;
+    border: 1px solid var(--voyah-border) !important;
+    border-radius: 4px !important;
   }
-
   .select2-container--default .select2-results__option {
-    color: rgba(240, 239, 255, 0.6) !important;
-    font-size: 0.85rem !important;
-    padding: 10px 14px !important;
+    color: rgba(255,255,255,0.7) !important;
+    font-size: 0.84rem !important;
+    padding: 9px 14px !important;
   }
-
   .select2-container--default .select2-results__option--highlighted[aria-selected] {
-    background: var(--accentdim) !important;
-    color: var(--accent2) !important;
+    background: var(--voyah-gold-dim) !important;
+    color: var(--voyah-gold-light) !important;
   }
-
   .select2-container--default .select2-results__option[aria-selected=true] {
-    background: rgba(108, 99, 255, 0.1) !important;
-    color: var(--accent) !important;
+    background: rgba(201,168,76,0.1) !important;
+    color: var(--voyah-gold) !important;
   }
-
   .select2-search--dropdown .select2-search__field {
-    background: rgba(108, 99, 255, 0.05) !important;
-    border: 1px solid var(--accentbrd) !important;
-    color: var(--white) !important;
-    border-radius: 6px !important;
-    padding: 7px 12px !important;
+    background: var(--voyah-input-bg) !important;
+    border: 1px solid var(--voyah-border) !important;
+    color: var(--voyah-white) !important;
+    border-radius: 3px !important;
+    padding: 6px 10px !important;
     font-size: 0.84rem !important;
   }
-
-  .select2.select2-container {
+  .select2.select2-container.select2-container--default {
     width: 100% !important;
   }
 
-  /* ══ TELÉFONO ══ */
-  .iti {
+  /* ── TELÉFONO ── */
+  .iti { width: 100%; }
+  .form-group input[type="tel"] { padding-left: 64px !important; }
+  .iti__selected-flag {
+    background: transparent !important;
+    border-right: 1px solid rgba(255,255,255,0.08) !important;
+    padding: 0 10px !important;
+  }
+  .iti__selected-dial-code { color: var(--voyah-gold) !important; font-size: 0.82rem !important; }
+  .iti__flag-container { top: 1px !important; bottom: 1px !important; }
+  .iti__country-list {
+    background: #1a1d24 !important;
+    border: 1px solid var(--voyah-border) !important;
+    border-radius: 4px !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+  }
+  .iti__country { color: rgba(255,255,255,0.75) !important; padding: 8px 12px !important; }
+  .iti__country:hover { background: var(--voyah-gold-dim) !important; }
+  .iti__country.iti__highlight { background: var(--voyah-gold-dim) !important; color: var(--voyah-gold) !important; }
+
+  /* ── CAPTCHA ── */
+  #confirmation-container embed {
+    border-radius: 4px;
+    overflow: hidden;
+    display: block;
     width: 100%;
   }
 
-  .form-group input[type="tel"] {
-    padding-left: 72px !important;
-  }
-
-  .iti__selected-flag {
-    background: transparent !important;
-    border-right: 1px solid var(--inputbrd) !important;
-    padding: 0 12px !important;
-  }
-
-  .iti__selected-dial-code {
-    color: var(--accent2) !important;
-    font-size: 0.8rem !important;
-    font-weight: 600 !important;
-  }
-
-  .iti__flag-container {
-    top: 1px !important;
-    bottom: 1px !important;
-  }
-
-  .iti__country-list {
-    background-color: #13131f !important;
-    background: #13131f !important;
-    border: 1px solid var(--accentbrd) !important;
-    border-radius: 8px !important;
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8) !important;
-    z-index: 9999 !important;
-    max-height: 200px !important;
-  }
-
-  .iti__country-list .iti__country,
-  .iti__country-list li.iti__country {
-    background-color: transparent !important;
-    color: rgba(240, 239, 255, 0.6) !important;
-    padding: 8px 12px !important;
-    font-size: 0.82rem !important;
-  }
-
-  .iti__country-list .iti__country:hover,
-  .iti__country-list li.iti__country:hover {
-    background-color: var(--accentdim) !important;
-    color: var(--accent2) !important;
-  }
-
-  .iti__country-list .iti__highlight,
-  .iti__country-list li.iti__highlight {
-    background-color: rgba(108, 99, 255, 0.1) !important;
-    color: var(--accent) !important;
-  }
-
-  .iti__country-name {
-    color: inherit !important;
-  }
-
-  .iti__dial-code {
-    color: rgba(108, 99, 255, 0.6) !important;
-  }
-
-  .iti__divider {
-    border-bottom-color: rgba(108, 99, 255, 0.08) !important;
-  }
-
-  /* ══ FILA INFERIOR — CHECKBOXES + BOTÓN ══ */
-  .bottom-row {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    flex-wrap: wrap;
-    margin-top: 6px;
-  }
-
-  .checks-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    flex: 1;
-    min-width: 240px;
-  }
-
-  #contact-form .form-group.checkbox {
-    margin-bottom: 0 !important;
-  }
-
+  /* ── CHECKBOXES ── */
   #contact-form .form-group.checkbox label {
-    color: var(--muted) !important;
+    color: rgba(255,255,255,0.45) !important;
     font-size: 0.72rem !important;
     line-height: 1.5;
     display: flex;
     align-items: flex-start;
-    gap: 8px;
+    gap: 10px;
     cursor: pointer;
   }
-
   #contact-form .form-group.checkbox input[type="checkbox"] {
-    width: 13px;
-    height: 13px;
+    width: 15px;
+    height: 15px;
     flex-shrink: 0;
     margin-top: 2px;
-    accent-color: var(--accent);
+    accent-color: var(--voyah-gold);
     cursor: pointer;
   }
-
   #contact-form .form-group.checkbox a {
-    color: var(--accent2) !important;
+    color: var(--voyah-gold) !important;
     text-decoration: none !important;
-    border-bottom: 1px solid var(--accentbrd);
+    border-bottom: 1px solid var(--voyah-border);
+    transition: color var(--transition);
   }
+  #contact-form .form-group.checkbox a:hover { color: var(--voyah-gold-light) !important; }
 
-  /* ══ BOTÓN ══ */
+  /* ── BOTÓN CTA ── */
   #submit-btn {
-    background: linear-gradient(135deg, var(--accent) 0%, #4f46e5 100%) !important;
-    color: #fff !important;
+    width: 100%;
+    background: linear-gradient(135deg, var(--voyah-gold) 0%, #a87c2a 100%) !important;
+    color: var(--voyah-black) !important;
     border: none !important;
-    border-radius: 8px !important;
-    padding: 13px 36px !important;
-    font-family: 'Outfit', sans-serif !important;
-    font-size: 0.9rem !important;
+    border-radius: 4px !important;
+    padding: 13px 20px !important;
+    font-family: 'Rajdhani', sans-serif !important;
+    font-size: 0.95rem !important;
     font-weight: 700 !important;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     cursor: pointer;
-    transition: all 0.3s var(--ease) !important;
-    white-space: nowrap;
-    height: auto !important;
-    box-shadow: 0 4px 24px rgba(108, 99, 255, 0.3) !important;
-    flex-shrink: 0;
+    transition: all var(--transition) !important;
     position: relative;
     overflow: hidden;
-    width: auto !important;
+    margin-top: 6px !important;
+    height: auto !important;
   }
-
   #submit-btn::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-    transition: left 0.4s var(--ease);
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity var(--transition);
   }
-
   #submit-btn:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 36px rgba(108, 99, 255, 0.45) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(201, 168, 76, 0.35) !important;
   }
+  #submit-btn:hover::before { opacity: 1; }
+  #submit-btn:active { transform: translateY(0); }
 
-  #submit-btn:hover::before {
-    left: 100%;
-  }
+  /* ── VITRINA ── */
+  #vitrina-container { display: none; }
 
-  #submit-btn:active {
-    transform: translateY(0) !important;
-  }
-
-  #vitrina-container {
-    display: none;
-  }
-
-  /* ══ SEPARADOR ══ */
-  .section-divider {
-    height: 1px;
-    background: linear-gradient(90deg, var(--accentbrd), transparent);
-    margin: 16px 0;
-  }
-
-  /* ══ CAPTCHA ══ */
-  #confirmation-container {
-    margin: 0 !important;
-  }
-
-  #confirmation-container embed {
-    display: block;
-    width: 100%;
-    border-radius: 6px;
-  }
-
-  /* ══ FOOTER ══ */
+  /* ── FOOTER ── */
   #chatbot-automotriz footer {
-    background: var(--bg) !important;
-    border-top: 1px solid rgba(108, 99, 255, 0.08) !important;
-    padding: 14px 40px !important;
-    font-size: 0.65rem !important;
+    background: var(--voyah-dark);
+    border-top: 1px solid var(--voyah-border);
+    padding: 14px 28px !important;
+    font-size: 0.68rem !important;
     opacity: 1 !important;
   }
-
   #chatbot-automotriz footer p {
-    color: rgba(240, 239, 255, 0.15) !important;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    color: rgba(255,255,255,0.25) !important;
+    letter-spacing: 0.05em;
     margin: 0;
   }
 
-  /* ══ ANIMACIONES ══ */
-  @keyframes fadeUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  /* ── ANIMACIÓN DE ENTRADA ── */
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
-
-  @keyframes blink {
-
-    0%,
-    100% {
-      opacity: 1;
-    }
-
-    50% {
-      opacity: 0.3;
-    }
-  }
-
   #info-container {
-    animation: fadeUp 0.5s var(--ease) both;
+    animation: fadeSlideUp 0.6s ease both;
   }
-
-  /* ══ RESPONSIVE ══ */
-  @media (max-width: 900px) {
-
-    .fields-grid,
-    .fields-grid-3,
-    .fields-grid-5 {
-      grid-template-columns: repeat(2, 1fr) !important;
-    }
-
-    #background {
-      height: 45vw !important;
-      min-height: 240px !important;
-    }
-
-    #info-container {
-      padding: 24px 20px 32px !important;
-    }
-
-    .bottom-row {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    #submit-btn {
-      width: 100% !important;
-      text-align: center;
-    }
+  .form-group {
+    animation: fadeSlideUp 0.5s ease both;
   }
+  .form-group:nth-child(1)  { animation-delay: 0.05s; }
+  .form-group:nth-child(2)  { animation-delay: 0.10s; }
+  .form-group:nth-child(3)  { animation-delay: 0.15s; }
+  .form-group:nth-child(4)  { animation-delay: 0.20s; }
+  .form-group:nth-child(5)  { animation-delay: 0.25s; }
+  .form-group:nth-child(6)  { animation-delay: 0.30s; }
+  .form-group:nth-child(7)  { animation-delay: 0.35s; }
+  .form-group:nth-child(8)  { animation-delay: 0.40s; }
+  .form-group:nth-child(9)  { animation-delay: 0.45s; }
+  .form-group:nth-child(10) { animation-delay: 0.50s; }
 
-  @media (max-width: 560px) {
-
-    .fields-grid,
-    .fields-grid-3,
-    .fields-grid-5 {
-      grid-template-columns: 1fr !important;
-    }
-
-    #background::after {
-      font-size: 1.2rem !important;
-      letter-spacing: 0.08em !important;
-    }
-  }
-
-  /* Ocultar mobile elements que no necesitamos */
-  #logo-container {
-    display: none !important;
-  }
-
-  #image-selecte-mobile {
-    display: none !important;
-  }
+  /* ── SCROLLBAR ── */
+  #contact-form::-webkit-scrollbar { width: 4px; }
+  #contact-form::-webkit-scrollbar-track { background: transparent; }
+  #contact-form::-webkit-scrollbar-thumb { background: var(--voyah-border); border-radius: 2px; }
 </style>
 
 <script type="text/javascript">
-  var domain = 'gezpomotor.prolibu.com';
-  var botName = 'NoAgentBotElectricCar';
-  var bearerToken = '2f7030e1-0580-4644-8c20-19645fef6020';
-  var currency = 'COP';
-  const useWebhookHubspot = true;
-  const pipelineId = '1000390393';
-  const dealstageId = '1531786955';
-  const pricingListFilter = 'Voyah';
-  const departmentFilter = 'voyah';
-  let fullPhoneNumber = '';
-  const customAttributes = [{ "name": "Prolibu", "idAttribute": "fuente_del_lead", "model": "contacts" }];
-  let productsList = [];
-  let agentsList = [];
-  let currentAgentIndex = Math.floor(Math.random() * 1000);
-  var params = { hostname: domain };
-  window.nodriza = new Nodriza(params);
 
-  function error(msg) { alert(msg); }
-  function success(msg) { alert(msg); }
+    /*====== VARIABLES GLOBALES =========*/
+    var domain = 'gezpomotor.prolibu.com';
+    var botName = 'NoAgentBotElectricCar';
+    var bearerToken = '2f7030e1-0580-4644-8c20-19645fef6020';
+    var currency = 'COP';
+    const useWebhookHubspot = true;
+    const pipelineId = '1000390393';
+    const dealstageId = '1531786955';
+    const pricingListFilter = 'Voyah';
+    const departmentFilter = 'voyah';
+    let fullPhoneNumber = '';
 
-  function fetchData(url, method, params, headers, successCallback, errorCallback) {
-    $.ajax({
-      url, method, data: params || {}, headers: headers || {},
-      success: successCallback,
-      error: function (jqXHR, textStatus, errorThrown) {
-        console.error("Error:", textStatus, errorThrown);
-        if (errorCallback) errorCallback(jqXHR);
-      }
-    });
-  }
+    const customAttributes = [
+        {
+            "name": "Prolibu",
+            "idAttribute": "fuente_del_lead",
+            "model": "contacts"
+        }
+    ]    
+    
+    let productsList = [];
+    let agentsList = [];
+    let currentAgentIndex = Math.floor(Math.random() * 1000);
+    var params = {hostname: domain};
+    window.nodriza = new Nodriza(params);        
 
-  function loadAgents() {
-    fetchData(`https://${domain}/v1/publicservices/getAgents`, "GET", { status: 'active', roles: ['agent'] }, {},
-      function (data) {
-        let agents = Array.isArray(data) ? data : (data.results || []);
-        if (!agents.length) { agentsList = []; return; }
-        let voyahAgents = agents.filter(a => (a.department || '').toLowerCase().trim() === departmentFilter.toLowerCase().trim());
-        if (!voyahAgents.length) { agentsList = []; return; }
-        agentsList = voyahAgents.map(a => ({
-          email: a.email,
-          firstName: a.firstName || a.firstname || '',
-          lastName: a.lastName || a.lastname || '',
-          department: a.department || '',
-          ciudad: (a.metadata && a.metadata.ciudad) ? a.metadata.ciudad : '',
-          vitrina: a.city || ''
-        }));
-      },
-      function (err) { console.error('Error agentes:', err); agentsList = []; }
-    );
-  }
+    function error(msg) { alert(msg); }
+    function success(msg) { alert(msg); }
 
-  function onCiudadChange() {
-    const ciudad = $('#ciudad').val();
-    $('#vitrina').val('').trigger('change');
-    $('#vitrina-container').hide();
-    if (!ciudad) return;
-    const vitrinas = [...new Set(agentsList.filter(a => a.ciudad.toLowerCase().trim() === ciudad.toLowerCase().trim()).map(a => a.vitrina).filter(v => v))].sort();
-    if (!vitrinas.length) return;
-    let opts = '<option value="">Seleccione una vitrina</option>';
-    vitrinas.forEach(v => { opts += `<option value="${v}">${v}</option>`; });
-    if ($('#vitrina').data('select2')) $('#vitrina').select2('destroy');
-    $('#vitrina').html(opts).select2({ placeholder: "Seleccione una vitrina", allowClear: true });
-    $('#vitrina-container').show();
-  }
-
-  function getNextAgent() {
-    if (!agentsList.length) return null;
-    const ciudad = $('#ciudad').val();
-    const vitrina = $('#vitrina').val();
-    const filtered = agentsList.filter(a =>
-      a.ciudad.toLowerCase().trim() === ciudad.toLowerCase().trim() &&
-      a.vitrina.toLowerCase().trim() === vitrina.toLowerCase().trim()
-    );
-    if (!filtered.length) return null;
-    const agent = filtered[currentAgentIndex % filtered.length];
-    currentAgentIndex++;
-    return agent.email;
-  }
-
-  function loadProducts() {
-    fetchData(`https://${domain}/v1/product`, "GET", { limit: 1000 }, { Authorization: `Bearer ${bearerToken}` },
-      function (response) {
-        if (!response || !response.length) return;
-        productsList = response.map(p => {
-          let pl = null;
-          if (p.pricingList) pl = typeof p.pricingList === 'object' ? p.pricingList.name : p.pricingList;
-          return { sku: p.sku, name: p.name, disabled: p.disabled, pricingList: pl };
+    function fetchData(url, method, params, headers, successCallback, errorCallback) {
+        $.ajax({
+            url: url,
+            method: method,
+            data: params || {},
+            headers: headers || {},
+            success: successCallback,
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error("Error en la solicitud:", textStatus, errorThrown);
+                if (errorCallback) errorCallback(jqXHR);
+            }
         });
-        $("#model").empty().append(getModelOptions());
+    }
+
+    function loadAgents() {
+        fetchData(
+            `https://${domain}/v1/publicservices/getAgents`,
+            "GET",
+            { status: 'active', roles: ['agent'] },
+            {},
+            function(data) {
+                let agents = Array.isArray(data) ? data : (data.results || []);
+                if (!agents || agents.length === 0) { agentsList = []; return; }
+
+                let voyahAgents = agents.filter(function(agent) {
+                    return (agent.department || '').toLowerCase().trim() === departmentFilter.toLowerCase().trim();
+                });
+
+                if (voyahAgents.length === 0) { agentsList = []; return; }
+
+                agentsList = voyahAgents.map(function(agent) {
+                    return {
+                        email: agent.email,
+                        firstName: agent.firstName || agent.firstname || '',
+                        lastName: agent.lastName || agent.lastname || '',
+                        department: agent.department || '',
+                        ciudad: (agent.metadata && agent.metadata.ciudad) ? agent.metadata.ciudad : '',
+                        vitrina: agent.city || ''
+                    };
+                });
+            },
+            function(err) { console.error('Error cargando agentes:', err); agentsList = []; }
+        );
+    }
+
+    function onCiudadChange() {
+        const ciudadSeleccionada = $('#ciudad').val();
+        $('#vitrina').val('').trigger('change');
+        $('#vitrina-container').hide();
+        if (!ciudadSeleccionada) return;
+
+        const vitrinasDeCiudad = [...new Set(
+            agentsList
+                .filter(a => a.ciudad.toLowerCase().trim() === ciudadSeleccionada.toLowerCase().trim())
+                .map(a => a.vitrina)
+                .filter(v => v)
+        )].sort();
+
+        if (vitrinasDeCiudad.length === 0) return;
+
+        let options = '<option value="">Seleccione una vitrina</option>';
+        vitrinasDeCiudad.forEach(v => { options += `<option value="${v}">${v}</option>`; });
+
+        if ($('#vitrina').data('select2')) $('#vitrina').select2('destroy');
+        $('#vitrina').html(options).select2({ placeholder: "Seleccione una vitrina", allowClear: true });
+        $('#vitrina-container').show();
+    }
+
+    function getNextAgent() {
+        if (!agentsList || agentsList.length === 0) return null;
+        const ciudadSeleccionada = $('#ciudad').val();
+        const vitrinaSeleccionada = $('#vitrina').val();
+        const agentsFiltrados = agentsList.filter(function(agent) {
+            return agent.ciudad.toLowerCase().trim() === ciudadSeleccionada.toLowerCase().trim() &&
+                   agent.vitrina.toLowerCase().trim() === vitrinaSeleccionada.toLowerCase().trim();
+        });
+        if (agentsFiltrados.length === 0) return null;
+        const agent = agentsFiltrados[currentAgentIndex % agentsFiltrados.length];
+        currentAgentIndex++;
+        return agent.email;
+    }
+
+    function loadProducts() {
+        fetchData(
+            `https://${domain}/v1/product`,
+            "GET",
+            { limit: 1000 },
+            { Authorization: `Bearer ${bearerToken}` },
+            function(response) {
+                if (!response || response.length === 0) return;
+                productsList = response.map(product => {
+                    let pricingListName = null;
+                    if (product.pricingList) {
+                        pricingListName = typeof product.pricingList === 'object' ? product.pricingList.name : product.pricingList;
+                    }
+                    return { sku: product.sku, name: product.name, disabled: product.disabled, pricingList: pricingListName };
+                });
+                $("#model").empty().append(getModelOptions());
+                $("#model").select2({ placeholder: "Seleccione el Modelo", allowClear: true });
+                let $opts = $("#model option");
+                $opts.sort((a, b) => $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase()));
+                $("#model").html($opts).trigger("change");
+            },
+            function(err) { console.error("Error productos:", err); }
+        );
+    }
+
+    function getSelectedProducts() {
+        if (!productsList) return [];
+        return productsList.filter(p => {
+            if (p.disabled || !p.pricingList) return false;
+            const pl = p.pricingList.toLowerCase().trim();
+            const fl = pricingListFilter.toLowerCase().trim();
+            return pl.includes(fl) || fl.includes(pl);
+        });
+    }
+
+    function getModelOptions() {
+        let selected = getSelectedProducts();
+        let options = selected.map(p => `<option value="${p.sku}">${p.name}</option>`).join('');
+        options += '<option value="" selected="selected">Seleccione un modelo</option>';
+        return options;
+    }
+
+    function getProductsBy(key, values) {
+        if (typeof values === 'string') values = [values];
+        for (let i = 0; i < productsList.length; i++)
+            for (let j = 0; j < values.length; j++)
+                if (productsList[i][key] === values[j]) return productsList[i];
+    }
+
+    function updateFullPhoneNumber() {
+        fullPhoneNumber = `+${iti.getSelectedCountryData().dialCode}${$("#mobile").val()}`;
+    }
+           
+    function submitForm(e) {
+        e.preventDefault();
+        let fields = $("#contact-form").serializeArray();
+        let json = {};
+        for (let i = 0; i < fields.length; i++) json[fields[i].name] = fields[i].value;
+
+        if (!$('#ciudad').val()) return error('Por favor seleccione una ciudad.');
+        if (!$('#vitrina').val()) return error('Por favor seleccione una vitrina.');
+        if (json.authorized !== 'on') return error('Por favor acepte nuestras políticas de tratamiento de datos.');
+        if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test($('#email').val())) return error('Email inválido');
+
+        let code = $('#code').val();
+        nodriza.api.confirmationCode.confirm({code: code}, function(err, results) {
+            if (!_.isEmpty(err)) { alert('Código inválido. Se refrescará el formulario.'); window.location.reload(); return; }
+            if (results && results.hash) { json.hash = results.hash; createProposal(json); }
+        });
+    }
+
+    function createProposal(json) {
+        customAttributes[0].value = 'Cotizador Web Voyah';
+        let model = getProductsBy('sku', json.model);
+        if (!model) return error('Producto no encontrado. Intente nuevamente.');
+        const assignedAgent = getNextAgent();
+        if (!assignedAgent) return error('No hay asesores disponibles. Intente más tarde.');
+
+        let to = { firstName: json.firstName, lastName: json.lastName, mobile: fullPhoneNumber, email: json.email, agent: assignedAgent };
+        let opt = {
+            chatbot: botName, to: to,
+            doc: {
+                title: 'Cotización ' + json.firstName + ' ' + json.lastName + ' - ' + model.name,
+                products: [{ id: model.sku, quantity: 1 }],
+                status: 'Ready', currency: currency,
+                metadata: {
+                    "webhook": useWebhookHubspot, "customAttributes": customAttributes,
+                    "pipeline": pipelineId, "dealstage": dealstageId,
+                    "customNameDealHubspot": json.firstName + ' ' + json.lastName + ' - ' + model.name,
+                    "agentEmail": assignedAgent, "deal_currency_code": currency
+                },
+                dic: { hash: json.hash }
+            },
+            emailClient: true, emailAgent: true, assignedAgentEmail: assignedAgent
+        };
+
+        window.nodriza.api.proposalbot.generate(opt, function(err, res) {
+            if (err || !res || !res.url) return error('Error al generar la cotización.');
+            alert('¡Cotización generada! Serás redirigido a WhatsApp.');
+            window.location = "https://api.whatsapp.com/send?phone=" + fullPhoneNumber +
+                             "&text=Hola " + json.firstName + " " + json.lastName +
+                             " da click para ver tu propuesta comercial " + res.url;
+        });
+    }
+
+    $(document).ready(function() {
+        loadAgents();
+        loadProducts();
+        
+        $('#confirmation-container').append('<embed id="confirmation-code" height="60px" src="https://' + domain + '/v1/ConfirmationCode/?color=white&noise=2&size=4">');
+
         $("#model").select2({ placeholder: "Seleccione el Modelo", allowClear: true });
-        let $opts = $("#model option");
-        $opts.sort((a, b) => $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase()));
-        $("#model").html($opts).trigger("change");
-      },
-      function (err) { console.error("Error productos:", err); }
-    );
-  }
+        $("#ciudad").select2({ placeholder: "Seleccione una ciudad", allowClear: true });
+        $("#ciudad").on("change", function() { onCiudadChange(); });
 
-  function getSelectedProducts() {
-    if (!productsList) return [];
-    return productsList.filter(p => {
-      if (p.disabled || !p.pricingList) return false;
-      const pl = p.pricingList.toLowerCase().trim();
-      const fl = pricingListFilter.toLowerCase().trim();
-      return pl.includes(fl) || fl.includes(pl);
-    });
-  }
+        let input = document.querySelector("#mobile");
+        let iti = window.intlTelInput(input, {
+            separateDialCode: true,
+            initialCountry: "co",
+            preferredCountries: ['co'],
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        });
 
-  function getModelOptions() {
-    let opts = getSelectedProducts().map(p => `<option value="${p.sku}">${p.name}</option>`).join('');
-    opts += '<option value="" selected="selected">Seleccione un modelo</option>';
-    return opts;
-  }
-
-  function getProductsBy(key, values) {
-    if (typeof values === 'string') values = [values];
-    for (let i = 0; i < productsList.length; i++)
-      for (let j = 0; j < values.length; j++)
-        if (productsList[i][key] === values[j]) return productsList[i];
-  }
-
-  function updateFullPhoneNumber() {
-    fullPhoneNumber = `+${iti.getSelectedCountryData().dialCode}${$("#mobile").val()}`;
-  }
-
-  function submitForm(e) {
-    e.preventDefault();
-    let fields = $("#contact-form").serializeArray();
-    let json = {};
-    for (let i = 0; i < fields.length; i++) json[fields[i].name] = fields[i].value;
-    if (!$('#ciudad').val()) return error('Por favor seleccione una ciudad.');
-    if (!$('#vitrina').val()) return error('Por favor seleccione una vitrina.');
-    if (json.authorized !== 'on') return error('Por favor acepte nuestras políticas de tratamiento de datos.');
-    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test($('#email').val())) return error('Email inválido');
-    let code = $('#code').val();
-    nodriza.api.confirmationCode.confirm({ code }, function (err, results) {
-      if (!_.isEmpty(err)) { alert('Código inválido. Se refrescará el formulario.'); window.location.reload(); return; }
-      if (results && results.hash) { json.hash = results.hash; createProposal(json); }
-    });
-  }
-
-  function createProposal(json) {
-    customAttributes[0].value = 'Cotizador Web Voyah';
-    let model = getProductsBy('sku', json.model);
-    if (!model) return error('Producto no encontrado. Intente nuevamente.');
-    const assignedAgent = getNextAgent();
-    if (!assignedAgent) return error('No hay asesores disponibles. Intente más tarde.');
-    let to = { firstName: json.firstName, lastName: json.lastName, mobile: fullPhoneNumber, email: json.email, agent: assignedAgent };
-    let opt = {
-      chatbot: botName, to,
-      doc: {
-        title: 'Cotización ' + json.firstName + ' ' + json.lastName + ' - ' + model.name,
-        products: [{ id: model.sku, quantity: 1 }],
-        status: 'Ready', currency,
-        metadata: {
-          "webhook": useWebhookHubspot, "customAttributes": customAttributes,
-          "pipeline": pipelineId, "dealstage": dealstageId,
-          "customNameDealHubspot": json.firstName + ' ' + json.lastName + ' - ' + model.name,
-          "agentEmail": assignedAgent, "deal_currency_code": currency
-        },
-        dic: { hash: json.hash }
-      },
-      emailClient: true, emailAgent: true, assignedAgentEmail: assignedAgent
-    };
-    window.nodriza.api.proposalbot.generate(opt, function (err, res) {
-      if (err || !res || !res.url) return error('Error al generar la cotización.');
-      alert('¡Cotización generada! Serás redirigido a WhatsApp.');
-      window.location = "https://api.whatsapp.com/send?phone=" + fullPhoneNumber +
-        "&text=Hola " + json.firstName + " " + json.lastName +
-        " da click para ver tu propuesta comercial " + res.url;
-    });
-  }
-
-  $(document).ready(function () {
-    loadAgents();
-    loadProducts();
-    $('#confirmation-container').append('<embed id="confirmation-code" height="60px" src="https://' + domain + '/v1/ConfirmationCode/?color=white&noise=2&size=4">');
-    $("#model").select2({ placeholder: "Modelo", allowClear: true });
-    $("#ciudad").select2({ placeholder: "Ciudad", allowClear: true });
-    $("#ciudad").on("change", function () { onCiudadChange(); });
-    let input = document.querySelector("#mobile");
-    let iti = window.intlTelInput(input, {
-      separateDialCode: true, initialCountry: "co", preferredCountries: ['co'],
-      utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-    });
-    $("#mobile").on("input", updateFullPhoneNumber);
-    input.addEventListener("countrychange", updateFullPhoneNumber);
-    window.iti = iti;
-    setTimeout(updateFullPhoneNumber, 1000);
-  });
+        $("#mobile").on("input", updateFullPhoneNumber);
+        input.addEventListener("countrychange", updateFullPhoneNumber);
+        window.iti = iti;
+        setTimeout(updateFullPhoneNumber, 1000);
+    });  
+ 
 </script>
 
-<div id="chatbot-automotriz">
 
-  <div id="logo-container" class="d-md-none">
-    <div class="row">
-      <div class="col-8 brand-name">Cotizador Voyah</div>
-      <div class="col-4 padding-right text-right"></div>
-    </div>
-  </div>
-
-  <div id="image-selecte-mobile" class="d-md-none"
-    style="background-image: url(https://s3.amazonaws.com/files.nodriza.io/gezpomotor/bot/voyahhearo.png);"></div>
-
-  <div class="row">
-
-    <!-- IMAGEN PANTALLA COMPLETA ARRIBA -->
-    <div id="background" class="col-12"
-      style="background-image: url(https://s3.amazonaws.com/files.nodriza.io/gezpomotor/bot/voyahhearo.png);">
+<div id="chatbot-automotriz">   
+    <div id="logo-container" class="d-md-none">
+        <div class="row">
+            <div class="col-8 brand-name">Cotizador Voyah</div>
+            <div class="col-4 padding-right text-right"></div>
+        </div>
     </div>
 
-    <!-- FORMULARIO HORIZONTAL ABAJO -->
-    <form id="contact-form" class="col-12" onsubmit="return submitForm(event);">
-      <div id="info-container">
+    <div id="image-selecte-mobile" class="d-md-none" style="background-image: url(https://s3.amazonaws.com/files.nodriza.io/gezpomotor/bot/voyahhearo.png);"></div>
+    
+    <div class="row">       
+        <div id="background" class="col col-12 col-sm-12 col-md-6 col-md-6 col-xl-8" style="background-image: url(https://s3.amazonaws.com/files.nodriza.io/gezpomotor/bot/voyahhearo.png);"></div>
+        
+        <form id="contact-form" class="col col-12 col-sm-12 col-md-6 col-xl-4" onsubmit="return submitForm(event);">
+            <div id="info-container">
+                <div class="row">
+                    <div class="col-12 padding-right">
+                        <h3 class="d-none d-lg-block">Déjenos sus datos y reciba una cotización al instante:</h3>
+                        <h5 class="d-md-none">Déjenos sus datos y reciba una cotización al instante:</h5>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <fieldset class="col-12 padding-right" style="border:none; padding-left:0; padding-right:0;">
 
-        <!-- HEADER -->
-        <div class="form-header">
-          <div class="form-header-left">
-            <h3 class="d-none d-lg-block">Solicita tu cotización ahora</h3>
-            <h5 class="d-md-none">Solicita tu cotización</h5>
-            <p>Completa tus datos y recibe una propuesta en segundos vía WhatsApp</p>
-          </div>
-          <div class="form-badge">● Sistema en línea</div>
-        </div>
+                        <h4 class="d-none d-lg-block">Seleccione el Modelo</h4>
+                        <h6 class="d-lg-none">Seleccione el Modelo</h6>
+                        <div class="form-group">
+                            <select class="form-control" name="model" id="model" required="">
+                                <option value="">Cargando modelos...</option>
+                            </select>
+                        </div>
 
-        <!-- FILA 1: Modelo + Ciudad + Vitrina -->
-        <div class="fields-grid-3">
-          <div class="field-group">
-            <span class="field-label">Modelo</span>
-            <div class="form-group">
-              <select class="form-control" name="model" id="model" required="">
-                <option value="">Cargando...</option>
-              </select>
-            </div>
-          </div>
-          <div class="field-group">
-            <span class="field-label">Ciudad</span>
-            <div class="form-group">
-              <select class="form-control" name="ciudad" id="ciudad" required="">
-                <option value="">Seleccione</option>
-                <option value="Chia">Chía</option>
-                <option value="Bogota">Bogotá</option>
-                <option value="Medellin">Medellín</option>
-              </select>
-            </div>
-          </div>
-          <div class="field-group" id="vitrina-container">
-            <span class="field-label">Vitrina</span>
-            <div class="form-group">
-              <select class="form-control" name="vitrina" id="vitrina">
-                <option value="">Seleccione</option>
-              </select>
-            </div>
-          </div>
-        </div>
+                        <h4 class="d-none d-lg-block">Seleccione su Ciudad</h4>
+                        <h6 class="d-lg-none">Seleccione su Ciudad</h6>
+                        <div class="form-group">
+                            <select class="form-control" name="ciudad" id="ciudad" required="">
+                                <option value="">Seleccione una ciudad</option>
+                                <option value="Chia">Chía</option>
+                                <option value="Bogota">Bogotá</option>
+                                <option value="Medellin">Medellín</option>
+                            </select>
+                        </div>
 
-        <div class="section-divider"></div>
+                        <div id="vitrina-container">
+                            <h4 class="d-none d-lg-block">Seleccione su Vitrina</h4>
+                            <h6 class="d-lg-none">Seleccione su Vitrina</h6>
+                            <div class="form-group">
+                                <select class="form-control" name="vitrina" id="vitrina">
+                                    <option value="">Seleccione una vitrina</option>
+                                </select>
+                            </div>
+                        </div>
 
-        <!-- FILA 2: Datos personales + verificación + botón -->
-        <div class="fields-grid-5">
-          <div class="field-group">
-            <span class="field-label">Nombres</span>
-            <div class="form-group">
-              <input class="form-control" type="text" name="firstName" id="firstName" placeholder="Tu nombre"
-                required="">
+                        <h4 class="d-none d-lg-block">Datos del Cliente</h4>
+                        <h6 class="d-lg-none">Datos del Cliente</h6>                    
+                        <div class="form-group">
+                            <input class="form-control" type="text" name="firstName" id="firstName" placeholder="Nombres" required="">
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control" type="text" name="lastName" id="lastName" placeholder="Apellido" required="">
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control" type="tel" name="mobile" id="mobile" placeholder="Celular" required="">
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control" type="email" name="email" id="email" placeholder="Email" required="">
+                        </div>
+                        <div class="form-group">
+                            <p id="confirmation-container"></p>
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control" type="text" name="code" id="code" placeholder="Confirme el código:" required="">
+                        </div>
+                        
+                        <div class="form-group checkbox">
+                            <label for="promotions">
+                                <input type="checkbox" name="promotions" id="promotions" checked="">
+                                Autorizo el uso de mis datos para recibir información sobre promociones, eventos y descuentos.
+                            </label>
+                        </div>
+                        <div class="form-group checkbox">
+                            <label for="authorized">
+                                <input type="checkbox" name="authorized" id="authorized" checked="">
+                                Autorizo el uso de mis datos según la <a href="#" target="_blank">política de clientes</a>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control btn btn-primary" id="submit-btn" type="submit" value="COTIZAR AHORA">
+                        </div>
+                    </fieldset>
+                </div>
             </div>
-          </div>
-          <div class="field-group">
-            <span class="field-label">Apellidos</span>
-            <div class="form-group">
-              <input class="form-control" type="text" name="lastName" id="lastName" placeholder="Tus apellidos"
-                required="">
-            </div>
-          </div>
-          <div class="field-group">
-            <span class="field-label">Celular</span>
-            <div class="form-group">
-              <input class="form-control" type="tel" name="mobile" id="mobile" placeholder="Celular" required="">
-            </div>
-          </div>
-          <div class="field-group">
-            <span class="field-label">Correo</span>
-            <div class="form-group">
-              <input class="form-control" type="email" name="email" id="email" placeholder="tu@correo.com" required="">
-            </div>
-          </div>
-          <div class="field-group">
-            <span class="field-label">Código</span>
-            <div class="form-group">
-              <input class="form-control" type="text" name="code" id="code" placeholder="Verificación" required="">
-            </div>
-          </div>
-        </div>
-
-        <!-- FILA 3: Captcha + checks + botón -->
-        <div class="bottom-row">
-          <div class="form-group" style="flex-shrink:0;">
-            <p id="confirmation-container"></p>
-          </div>
-          <div class="checks-group">
-            <div class="form-group checkbox">
-              <label for="promotions">
-                <input type="checkbox" name="promotions" id="promotions" checked="">
-                Autorizo recibir información sobre promociones y eventos.
-              </label>
-            </div>
-            <div class="form-group checkbox">
-              <label for="authorized">
-                <input type="checkbox" name="authorized" id="authorized" checked="">
-                Acepto la <a href="#" target="_blank">política de tratamiento de datos</a>
-              </label>
-            </div>
-          </div>
-          <div class="form-group" style="flex-shrink:0;">
-            <input class="form-control btn btn-primary" id="submit-btn" type="submit" value="Cotizar ahora →">
-          </div>
-        </div>
-
-      </div>
-    </form>
-  </div>
-
-  <footer class="row" style="padding-left:0;">
-    <p id="copyright">©2025 GezpoMotor · Todos los derechos reservados</p>
-  </footer>
-
+        </form>
+    </div>   
+    <footer class="row" style="padding-left:0;">
+        <p id="copyright">©2025 GezpoMotor · Todos los derechos reservados.</p>
+    </footer>
 </div>
+"
