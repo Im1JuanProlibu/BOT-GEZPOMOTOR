@@ -1,391 +1,279 @@
-# 🚗 Prolibu Automotive Chatbot
+# Prolibu Quotation Bot
 
-Sistema de cotización automotriz embebible en cualquier plataforma web. Carga dinámicamente desde GitHub sin necesidad de modificar el editor de la plataforma en cada actualización.
+Sistema de cotización embebible en cualquier plataforma web y cualquier sector. Se actualiza automáticamente desde GitHub sin tocar el editor de la plataforma.
 
 ---
 
-## 📁 Estructura del repositorio
+## Cómo funciona — Flujo teórico
+
+```
+Plataforma Prolibu (editor del bot)
+    └── 2 líneas de código fijas (nunca se tocan de nuevo)
+            └── carga loader.js desde GitHub Pages
+                    └── loader.js hace fetch al archivo {cliente}-bot.html en GitHub
+                            └── inyecta el HTML + carga los scripts en orden
+                                    └── el bot aparece en pantalla y consulta las APIs de Prolibu
+```
+
+**La clave del sistema:** la plataforma solo ve una etiqueta `<script src>` apuntando a GitHub Pages — algo que no puede ejecutar ni modificar. Todo el código real vive en GitHub. Cuando se necesita actualizar el bot, solo se hace `git push` y la plataforma se actualiza sola en 1-2 minutos sin volver a tocar el editor.
+
+---
+
+## Estructura del repositorio
 
 ```
 /
-├── voyah-bot.html     →  Código fuente del bot (HTML + CSS + JS)
-└── loader.js          →  Script intermediario que carga el bot en la plataforma
+├── loader.js              →  Script que carga el bot en la plataforma
+├── {cliente}-bot.html     →  Bot del cliente (HTML + CSS + JS todo en uno)
+├── {cliente2}-bot.html    →  Bot de otro cliente
+└── README.md
 ```
 
-> El nombre `voyah-bot.html` puede variar según el cliente. Lo importante es que `loader.js` apunte al archivo correcto.
+> Cada cliente tiene su propio archivo `{cliente}-bot.html`. El `loader.js` es uno solo y apunta al archivo del cliente correspondiente.
 
 ---
 
-## ⚙️ Cómo funciona el sistema
+## Qué va en el editor de la plataforma
 
-```
-Plataforma (editor)
-    └── 2 líneas de código fijas
-            └── carga loader.js desde GitHub Pages
-                    └── hace fetch a {cliente}-bot.html desde raw.githubusercontent.com
-                            └── inyecta HTML + carga scripts en orden secuencial
-                                    └── inicializa el formulario y consulta APIs de Prolibu
-```
-
-### ¿Por qué este enfoque?
-
-Los editores de plataformas como Prolibu ejecutan y guardan el resultado del código HTML/JS cuando detectan scripts. Si se pega el bot directamente, el editor renderiza el formulario y guarda el HTML estático, perdiendo el código fuente.
-
-La solución es que el editor solo vea una etiqueta `<script src>` estática apuntando a GitHub Pages — algo que no puede ejecutar ni renderizar.
-
----
-
-## 🖥️ Lo que va en el editor de la plataforma
-
-Configurar **una sola vez**. Nunca más se toca.
+Esto se configura **una sola vez** y nunca más se toca.
 
 ```html
 <div id="bot-{cliente}">Cargando...</div>
 <script src="https://{usuario}.github.io/{repo}/loader.js"></script>
 ```
 
-**Pasos:**
-1. Abrir el editor HTML del bot
+**Pasos para pegarlo:**
+1. Abrir el editor HTML del bot en Prolibu
 2. Cambiar a vista código `< >`
 3. `Ctrl + A` → borrar todo
-4. Pegar las 2 líneas
-5. Dar OK **sin** cambiar a vista visual
+4. Pegar las 2 líneas de arriba
+5. Dar OK **sin** cambiar a vista visual (si se cambia a visual, la plataforma rompe el código)
 
 ---
 
-## 🔄 loader.js — Funcionamiento detallado
+## Cómo se configura GitHub Pages
 
-```js
-(function () {
-  var URL = 'https://raw.githubusercontent.com/{usuario}/{repo}/main/{cliente}-bot.html?t=' + Date.now();
-  // ...
-})();
-```
+Para que el `loader.js` sea accesible públicamente:
 
-### Pasos internos del loader
+1. Ir al repositorio en GitHub → `Settings → Pages`
+2. Source: **Deploy from a branch**
+3. Branch: **main** → **/ (root)**
+4. Guardar
 
-| Paso | Qué hace |
-|------|----------|
-| 1 | Hace `fetch` al HTML del bot con `?t=Date.now()` para forzar descarga fresca |
-| 2 | Parsea el HTML en un `div` temporal |
-| 3 | Extrae todos los `<script src>` externos y el código JS inline por separado |
-| 4 | Inyecta el HTML del formulario en `#bot-{cliente}` |
-| 5 | Carga los scripts externos **en orden secuencial** (uno espera al anterior) |
-| 6 | Ejecuta el código JS inline una vez que todos los scripts están listos |
-
-### ¿Por qué carga secuencial y no paralela?
-
-Si los scripts se cargan en paralelo, el código del bot se ejecuta antes de que jQuery, Nodriza SDK o Select2 estén disponibles, causando errores como `jQuery is not defined` o `Nodriza is not defined`. La carga secuencial garantiza el orden correcto de dependencias.
-
-### Función `loadInOrder`
-
-```js
-function loadInOrder(srcs, callback) {
-  if (!srcs.length) return callback();
-  loadScript(srcs[0], function () {
-    loadInOrder(srcs.slice(1), callback);
-  });
-}
-```
-
-Carga recursivamente: espera a que el primero termine antes de cargar el siguiente. Cuando la lista está vacía, ejecuta el callback (el código inline del bot).
+URL resultante: `https://{usuario}.github.io/{repo}/loader.js`
 
 ---
 
-## 📦 Dependencias del bot
-
-Los siguientes scripts se cargan en este orden dentro del HTML del bot:
-
-| Librería | URL | Para qué se usa |
-|----------|-----|-----------------|
-| jQuery 2.2.2 | ajax.googleapis.com | DOM, AJAX, eventos |
-| Nodriza SDK | cdn.nodriza.io | APIs de Prolibu (agentes, productos, propuestas) |
-| Lodash 4.17 | cdnjs.cloudflare.com | Utilidades JS (validación de respuestas) |
-| Select2 4.1 | cdn.jsdelivr.net | Dropdowns mejorados |
-| intl-tel-input 17 | cdnjs.cloudflare.com | Selector de código de país |
-
-> **Importante:** el orden importa. jQuery debe cargarse antes que Nodriza SDK. Lodash antes que la lógica del bot.
-
----
-
-## 🔌 APIs de Prolibu utilizadas
-
-### `GET /v1/publicservices/getAgents`
-
-Carga la lista de asesores activos.
-
-```js
-fetchData(`https://${domain}/v1/publicservices/getAgents`, "GET",
-  { status: 'active', roles: ['agent'] }, {},
-  function(data) { /* filtrar por departamento */ }
-);
-```
-
-**Filtro aplicado:** se filtran los agentes cuyo campo `department` coincida con `departmentFilter`.
-
-**Campos que usa el bot del objeto agente:**
-
-| Campo | Requerido | Descripción |
-|-------|-----------|-------------|
-| `email` | ✅ Sí | Identificador único del asesor. Se usa para asignar el lead. |
-| `firstName` / `firstname` | ✅ Sí | Nombre del asesor (acepta ambas variantes de capitalización) |
-| `lastName` / `lastname` | ✅ Sí | Apellido del asesor |
-| `department` | ✅ Sí | Departamento al que pertenece. Se filtra contra `departmentFilter`. |
-| `city` | Depende | Se usa como nombre de **vitrina**. Si no existe, el asesor no tendrá vitrina asignada. |
-| `metadata.ciudad` | Depende | Se usa como **ciudad** del asesor. Si no existe, el campo `ciudad` queda vacío y el asesor no aparecerá en ninguna ciudad. |
-
-> ⚠️ La estructura del objeto agente puede variar según la configuración del cliente en Prolibu. Si los campos de ciudad o vitrina vienen en otros campos (por ejemplo directamente en `city` sin metadata), se debe ajustar la función `loadAgents()` para mapear correctamente los campos.
-
-**Ejemplo de mapeo en `loadAgents()`:**
-```js
-agentsList = voyahAgents.map(a => ({
-  email:     a.email,
-  firstName: a.firstName || a.firstname || '',
-  lastName:  a.lastName  || a.lastname  || '',
-  department: a.department || '',
-  ciudad:    a.metadata?.ciudad || a.ciudad || '',   // ajustar según el cliente
-  vitrina:   a.city || a.vitrina || ''               // ajustar según el cliente
-}));
-```
-
----
-
-### `GET /v1/product`
-
-Carga la lista de productos/vehículos.
-
-```js
-fetchData(`https://${domain}/v1/product`, "GET",
-  { limit: 1000 },
-  { Authorization: `Bearer ${bearerToken}` },
-  function(response) { /* filtrar por pricingList */ }
-);
-```
-
-**Filtro aplicado:** se muestran solo los productos cuya `pricingList` contenga el valor de `pricingListFilter`.
-
-**Estructura esperada por producto:**
-```json
-{
-  "sku": "VOY-001",
-  "name": "Voyah Free",
-  "disabled": false,
-  "pricingList": { "name": "Voyah" }
-}
-```
-
----
-
-### `GET /v1/ConfirmationCode/`
-
-Genera el captcha numérico. Se carga como un `<embed>` en el formulario.
-
-```js
-$('#confirmation-container').append(
-  '<embed src="https://' + domain + '/v1/ConfirmationCode/?color=white&noise=2&size=4">'
-);
-```
-
-**Parámetros:**
-| Parámetro | Valor | Descripción |
-|-----------|-------|-------------|
-| `color` | `white` / `black` | Color del texto del código |
-| `noise` | `1-5` | Nivel de ruido visual |
-| `size` | `1-6` | Tamaño del código |
-
----
-
-### `nodriza.api.confirmationCode.confirm({ code })`
-
-Valida el código ingresado por el usuario.
-
-```js
-nodriza.api.confirmationCode.confirm({ code }, function(err, results) {
-  if (!_.isEmpty(err)) {
-    // código inválido → recargar
-    window.location.reload();
-    return;
-  }
-  if (results && results.hash) {
-    json.hash = results.hash;
-    createProposal(json);
-  }
-});
-```
-
-Si es válido, devuelve un `hash` que se debe incluir en la generación de la propuesta.
-
----
-
-### `nodriza.api.proposalbot.generate(options)`
-
-Genera la propuesta comercial y registra el lead.
-
-```js
-nodriza.api.proposalbot.generate({
-  chatbot: botName,
-  to: {
-    firstName, lastName, mobile, email,
-    agent: assignedAgentEmail
-  },
-  doc: {
-    title: 'Cotización Nombre - Modelo',
-    products: [{ id: sku, quantity: 1 }],
-    status: 'Ready',
-    currency: 'COP',
-    metadata: {
-      webhook: true,              // activa webhook HubSpot
-      pipeline: pipelineId,
-      dealstage: dealstageId,
-      customNameDealHubspot: 'Nombre - Modelo',
-      agentEmail: assignedAgentEmail,
-      deal_currency_code: 'COP',
-      customAttributes: [...]
-    },
-    dic: { hash }                 // hash del captcha validado
-  },
-  emailClient: true,
-  emailAgent: true,
-  assignedAgentEmail
-}, function(err, res) {
-  // res.url → URL de la propuesta generada
-  window.location = `https://api.whatsapp.com/send?phone=${mobile}&text=...${res.url}`;
-});
-```
-
----
-
-## 🧠 Funciones principales del bot
-
-### `loadAgents()`
-Consulta la API de agentes, filtra por `departmentFilter` y construye el array `agentsList` con estructura normalizada (email, nombre, ciudad, vitrina).
-
-### `loadProducts()`
-Consulta la API de productos con el Bearer Token, filtra por `pricingListFilter` y puebla el `<select#model>` con Select2.
-
-### `onCiudadChange()`
-Se ejecuta cuando el usuario cambia la ciudad. Filtra `agentsList` por ciudad, extrae las vitrinas únicas disponibles y muestra el `<select#vitrina>` dinámicamente.
-
-### `getNextAgent()`
-Selecciona el asesor a asignar usando **balanceo round-robin** — filtra los agentes por ciudad y vitrina seleccionada, y rota entre ellos usando `currentAgentIndex % filtered.length`.
-
-### `getSelectedProducts()`
-Filtra `productsList` para retornar solo los productos activos que coincidan con `pricingListFilter` (búsqueda bidireccional: el filtro puede estar contenido en el nombre o viceversa).
-
-### `getProductsBy(key, values)`
-Busca un producto en `productsList` por cualquier campo. Se usa para obtener el objeto completo del producto seleccionado a partir del SKU.
-
-### `updateFullPhoneNumber()`
-Combina el código de marcación del país (de intl-tel-input) con el número ingresado para construir `fullPhoneNumber` en formato E.164 (`+573001234567`).
-
-### `submitForm(e)`
-Valida el formulario completo antes de enviar:
-- Ciudad y vitrina seleccionadas
-- Checkbox de autorización marcado
-- Email con formato válido (regex)
-- Valida el código captcha vía SDK
-
-### `createProposal(json)`
-Construye el objeto de propuesta y llama a `proposalbot.generate()`. Si la respuesta incluye `res.url`, redirige al usuario a WhatsApp con el link de la cotización.
-
----
-
-## ⚙️ Variables de configuración
-
-Para adaptar el bot a un nuevo cliente, cambiar estas variables al inicio del `<script>` en el archivo HTML:
-
-```js
-var domain           = 'cliente.prolibu.com';       // dominio del cliente en Prolibu
-var botName          = 'NombreDelBot';               // nombre del chatbot configurado
-var bearerToken      = 'xxxx-xxxx-xxxx-xxxx';        // token de autenticación de productos
-var currency         = 'COP';                        // moneda (COP, USD, etc.)
-const pricingListFilter = 'NombreLista';             // filtra qué productos mostrar
-const departmentFilter  = 'departamento';            // filtra qué agentes mostrar
-const pipelineId     = '000000000';                  // ID del pipeline en HubSpot
-const dealstageId    = '000000000';                  // ID del dealstage en HubSpot
-const useWebhookHubspot = true;                      // activar/desactivar integración HubSpot
-```
-
----
-
-## 🚀 Flujo de trabajo — Cómo actualizar el bot
+## Cómo actualizar el bot
 
 ```bash
-# 1. Editar el archivo del bot en VS Code
-# 2. Guardar cambios
-# 3. Subir a GitHub
+# Editar el archivo del cliente en VS Code, guardar y subir
 
 git add {cliente}-bot.html
 git commit -m "descripción del cambio"
 git push origin main
 
-# GitHub Pages publica automáticamente en ~1-2 minutos
-# El bot en la plataforma se actualiza solo sin tocar el editor
+# En 1-2 minutos el bot en la plataforma se actualiza solo
 ```
 
 ---
 
-## 🐛 Debug — Logs del loader
+## Checklist — Nuevo cliente
 
-El `loader.js` incluye logs detallados en consola. Para diagnosticar problemas abrir `F12 → Console`:
+- [ ] Duplicar un `{base}-bot.html` existente y renombrarlo `{cliente}-bot.html`
+- [ ] Actualizar las variables de configuración dentro del archivo (ver sección abajo)
+- [ ] Actualizar la imagen o video de fondo (`bgImg`)
+- [ ] Actualizar `REPO_RAW` en `loader.js` para apuntar al nuevo `{cliente}-bot.html`
+- [ ] Verificar que GitHub Pages esté activo en el repositorio
+- [ ] Pegar las 2 líneas en el editor de la plataforma (ver sección arriba)
+- [ ] Abrir `F12 → Console` y verificar que `productsList` y `agentsList` tengan items
+
+---
+
+## Variables de configuración del bot
+
+Estas variables están al inicio del `<script>` en el archivo `{cliente}-bot.html`:
+
+| Variable | Tipo | Descripción |
+|----------|------|-------------|
+| `domain` | string | Dominio del cliente en Prolibu. Ej: `cliente.prolibu.com` |
+| `botName` | string | Slug del proposalbot configurado en Prolibu |
+| `bearerToken` | string | Token de autenticación para consultar productos y categorías |
+| `currency` | string | Moneda de las propuestas: `COP`, `USD`, etc. |
+| `filtroProductos` | string | Primer filtro de productos: `"Pricing List"`, `"Product"` o vacío |
+| `filtroProductos2` | string | Segundo filtro opcional: igual que el anterior. Dejar vacío si no aplica |
+| `rolesString` | string | Roles de agentes a cargar, separados por coma. Ej: `"agent, admin"` |
+| `useWebhookHubspot` | boolean | `true` activa la integración con HubSpot. `false` la desactiva *(opcional)* |
+| `customAttributes` | array | Campos personalizados para HubSpot. Solo necesario si `useWebhookHubspot = true` |
+
+---
+
+## Funciones base del bot
+
+Todo bot está compuesto por las mismas funciones esenciales:
+
+### `fetchData(url, method, params, headers, successCallback, errorCallback)`
+Función genérica de AJAX. Todas las llamadas a la API pasan por aquí. Usa jQuery `$.ajax` internamente.
+
+### `loadAgents()`
+Consulta `GET /v1/publicservices/getAgents` (endpoint público, sin auth) con los roles configurados en `rolesString`. Construye el array `agentsList` y puebla el `<select#agent>` con Select2.
+
+### `loadProducts()`
+Consulta `GET /v1/product?disabled=false` con el `bearerToken`. Construye `productsList` con `pricingList`, `category`, `sku`, `name` y `disabled`. Puebla el `<select#model>` con Select2.
+
+### `loadCategories()`
+Consulta `GET /v1/category` con el `bearerToken`. Construye `categoriesList` y puebla los selectores `#category` y `#category2` si `filtroProductos` está definido.
+
+### `getSelectedProducts()`
+Filtra `productsList` según la categoría/lista de precios seleccionada en `#category` y/o `#category2`. Soporta filtros dobles simultáneos. Devuelve solo productos activos (`disabled: false`).
+
+### `getModelOptions()`
+Toma el resultado de `getSelectedProducts()`, lo ordena alfabéticamente y genera el HTML de opciones para el `<select#model>`.
+
+### `getProductsBy(key, values)`
+Busca un producto en `productsList` por cualquier campo. Se usa en `createProposal` para obtener el objeto completo del producto a partir del SKU seleccionado.
+
+### `ordenarOpciones(selector)`
+Ordena alfabéticamente las opciones de cualquier `<select>`. Se aplica después de poblar agentes, productos y categorías.
+
+### `toggleContainer()`
+Muestra u oculta el contenedor del selector de modelos según si hay una categoría seleccionada. Solo aplica cuando `filtroProductos` está activo.
+
+### `updateFullPhoneNumber()`
+Combina el código de marcación del país (obtenido de intl-tel-input) con el número ingresado. Construye `fullPhoneNumber` en formato E.164: `+573001234567`.
+
+### `submitForm(e)`
+Valida que el checkbox de autorización esté marcado, luego llama a `nodriza.api.confirmationCode.confirm()` para validar el captcha. Si el captcha es válido recibe un `hash` y llama a `createProposal(json)`.
+
+### `createProposal(json)`
+Construye el payload completo y hace el POST a `/v1/proposalbot/generate` via el SDK de Nodriza. Si la respuesta incluye `res.url`, redirige al usuario a WhatsApp con el link de la cotización.
+
+---
+
+## Flujo completo de una cotización
+
+```
+$(document).ready()
+    ├── loadAgents()      →  puebla #agent
+    ├── loadProducts()    →  puebla #model
+    └── loadCategories()  →  puebla #category y #category2 (si aplica)
+
+Usuario llena el formulario y hace submit
+    └── submitForm(e)
+            └── valida checkbox de autorización
+                    └── nodriza.api.confirmationCode.confirm({ code })
+                            └── si válido → recibe hash
+                                    └── createProposal(json)
+                                            └── POST /v1/proposalbot/generate
+                                                    └── recibe res.url
+                                                            └── redirige a WhatsApp
+```
+
+### Body del POST que genera la propuesta
+
+```json
+{
+  "chatbot": "slug-del-bot",
+  "to": {
+    "firstName": "...",
+    "lastName": "...",
+    "mobile": "+573001234567",
+    "email": "...",
+    "agent": "email-del-asesor@cliente.com"
+  },
+  "doc": {
+    "title": "Cotización Nombre - Producto",
+    "products": [{ "id": "sku-del-producto", "quantity": 1 }],
+    "status": "Ready",
+    "currency": "COP",
+    "metadata": {
+      "webhook": false,
+      "customAttributes": []
+    },
+    "dic": { "hash": "hash-del-captcha" }
+  },
+  "emailClient": true,
+  "emailAgent": true,
+  "assignedAgentEmail": "email-del-asesor@cliente.com"
+}
+```
+
+> `webhook: false` por defecto. Solo se activa si el cliente tiene HubSpot configurado.
+
+---
+
+## Tipos de bots que se pueden construir
+
+Partiendo de las funciones base, se pueden armar distintas variantes:
+
+### Bot básico — sin filtros
+El más simple. Carga todos los productos activos directamente en el selector de modelos. El usuario elige producto, llena sus datos y cotiza.
+- `filtroProductos = ''` y `filtroProductos2 = ''`
+- Los selectores de categoría no aparecen
+- `#product-container` siempre visible
+
+### Bot con un filtro de categoría
+El usuario primero elige una categoría (lista de precios o categoría de producto) y el selector de modelos se puebla dinámicamente con los productos de esa categoría.
+- `filtroProductos = 'Pricing List'` o `filtroProductos = 'Product'`
+- `filtroProductos2 = ''`
+- El `#product-container` aparece solo cuando hay categoría seleccionada
+
+### Bot con dos filtros encadenados
+Para catálogos con dos niveles de clasificación. Ejemplo: primero se elige la línea de productos y luego la categoría específica.
+- `filtroProductos = 'Pricing List'` y `filtroProductos2 = 'Product'`
+- Ambos selectores activos
+- Los productos se filtran combinando los dos valores seleccionados
+
+### Bot con selección de asesor visible
+El usuario puede elegir directamente su asesor desde un dropdown. Útil cuando los clientes ya conocen a su ejecutivo de cuenta.
+- `loadAgents()` activo con el `rolesString` configurado
+- `<select#agent>` visible en el formulario
+
+### Bot sin selección de asesor
+Para flujos automáticos donde el asesor se asigna por round-robin o se define fijo sin que el usuario lo vea.
+- `<select#agent>` oculto con CSS o eliminado del HTML
+- El asesor se asigna en `createProposal()` usando lógica interna
+
+### Bot con integración HubSpot *(opcional)*
+Crea automáticamente un deal en HubSpot al generar la propuesta. No es requerido — la propuesta se genera igual sin esto.
+- `useWebhookHubspot = true`
+- Configurar `customAttributes` con los campos del CRM del cliente:
+```js
+const customAttributes = [
+  { name: "Campo Deal",    idAttribute: "hs_field",    model: "deals",    value: "valor" },
+  { name: "Campo Contacto", idAttribute: "hs_contact", model: "contacts", value: "valor" }
+]
+```
+
+---
+
+## Debug rápido — F12 Console
 
 | Log | Qué significa |
 |-----|---------------|
-| `🚀 [LOADER] Iniciando...` | El script se ejecutó correctamente |
-| `📡 [LOADER] Respuesta HTTP: 200 OK` | GitHub respondió bien |
-| `✅ [LOADER] Cargado: {url}` | Un script externo cargó correctamente |
-| `⚠️ [LOADER] Error cargando: {url}` | Un script externo falló (no bloquea) |
-| `🎉 [LOADER] Bot completamente cargado.` | Todo listo |
-| `🔎 [LOADER] productsList: 0 items` | La API de productos no retornó datos o el filtro no coincide |
-| `🔎 [LOADER] agentsList: 0 items` | No hay agentes con el departamento configurado |
-| `❌ [LOADER] Error: HTTP 404` | El archivo HTML no se encontró en el repo |
+| `[LOADER] Iniciando...` | El script cargó correctamente |
+| `[LOADER] Respuesta HTTP: 200 OK` | GitHub respondió bien |
+| `[LOADER] Bot completamente cargado.` | Todo listo |
+| `productsList: 0 items` | El filtro de productos no coincide o el token es incorrecto |
+| `agentsList: 0 items` | No hay agentes con el rol configurado en `rolesString` |
+| `[LOADER] Error: HTTP 404` | El archivo HTML no existe en el repo o `REPO_RAW` apunta mal |
 
 ---
 
-## 🔑 GitHub Pages — Configuración
+## Prompt — Generar un bot nuevo con IA
 
-Para que el sistema funcione, GitHub Pages debe estar activo en el repositorio:
-
-1. Ir a `Settings → Pages`
-2. Source: **Deploy from a branch**
-3. Branch: **main** → **/ (root)**
-4. Guardar
-
-URL resultante: `https://{usuario}.github.io/{repo}/`
-
-> **¿Por qué GitHub Pages y no `raw.githubusercontent.com` directamente?**  
-> Algunas plataformas bloquean `raw.githubusercontent.com` por CSP. GitHub Pages usa el dominio `github.io` que no tiene esa restricción y permite la carga de scripts sin problemas.
-
----
-
-## 📋 Checklist — Nuevo cliente
-
-- [ ] Duplicar `voyah-bot.html` → renombrar `{cliente}-bot.html`
-- [ ] Actualizar variables de configuración (`domain`, `botName`, `bearerToken`, etc.)
-- [ ] Actualizar `pricingListFilter` y `departmentFilter`
-- [ ] Actualizar ciudades en el `<select#ciudad>`
-- [ ] Actualizar imagen de fondo (`background-image`)
-- [ ] Actualizar `REPO_RAW` en `loader.js` para apuntar al nuevo archivo HTML
-- [ ] Verificar que GitHub Pages esté activo
-- [ ] Pegar las 2 líneas en el editor de la plataforma
-- [ ] Probar en F12 que `productsList` y `agentsList` tengan items
-
----
-
-## 🤖 Prompt genérico para generar un bot desde cero con IA
-
-Usar este prompt con cualquier IA (Claude, ChatGPT, Copilot) para generar un bot nuevo desde cero. Completar las secciones entre `[ ]` con la información del cliente.
+Usar este prompt con Claude, ChatGPT o Copilot para generar el archivo `{cliente}-bot.html` desde cero. Completar las secciones entre `[ ]`.
 
 ````
-Necesito que construyas un bot de cotización automotriz en un solo archivo HTML
+Necesito que construyas un bot de cotización en un solo archivo HTML
 que funcionará embebido en una plataforma web via un loader.js externo.
 
-## Stack y librerías requeridas (cargar en este orden exacto via <script>)
-1. jQuery 2.2.2 — https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js
-2. Nodriza SDK  — https://s3.amazonaws.com/cdn.nodriza.io/sdk/nodriza@lastest/nodriza-sdk.bundle.js
-3. Lodash 4.17  — https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.core.min.js
-4. Select2 4.1  — https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js
-5. intl-tel-input 17 — https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js
+## Stack y librerías (cargar en este orden exacto)
+1. jQuery 2.2.2       — https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js
+2. Nodriza SDK        — https://s3.amazonaws.com/cdn.nodriza.io/sdk/nodriza@lastest/nodriza-sdk.bundle.js
+3. Lodash 4.17        — https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.core.min.js
+4. Select2 4.1        — https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js
+5. intl-tel-input 17  — https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js
 
 CSS requerido:
 - https://s3.amazonaws.com/cdn.nodriza.io/assets/css/chatbot.automotriz.css
@@ -395,95 +283,54 @@ CSS requerido:
 ## Variables de configuración
 ```js
 var domain              = '[cliente.prolibu.com]';
-var botName             = '[NombreDelBot]';
-var bearerToken         = '[xxxx-xxxx-xxxx-xxxx]';
-var currency            = '[COP]';
-const pricingListFilter = '[NombreDeLaLista]';
-const departmentFilter  = '[nombre_departamento]';
-const pipelineId        = '[ID_pipeline_hubspot]';
-const dealstageId       = '[ID_dealstage_hubspot]';
-const useWebhookHubspot = true;
+var botName             = '[slug del proposalbot en Prolibu]';
+const bearerToken       = '[xxxx-xxxx-xxxx-xxxx]';
+const currency          = '[COP|USD]';
+const filtroProductos   = '[Pricing List | Product | vacío]';
+const filtroProductos2  = '[Pricing List | Product | vacío]';
+const rolesString       = '[agent, admin]';
+const useWebhookHubspot = false;   // true solo si el cliente tiene HubSpot
+const customAttributes  = [];      // llenar solo si useWebhookHubspot = true
 ```
 
-## Ciudades y vitrinas disponibles
-[Listar ciudades. Ejemplo:]
-- Bogotá
-- Medellín
-- Chía
+## Tipo de bot
+[Indicar cuál de estos tipos aplica:]
+- Sin filtros: todos los productos activos en un solo select
+- Con un filtro: primero elige categoría, luego producto
+- Con dos filtros: dos niveles de categoría antes del producto
+- Con asesor visible: el usuario elige su asesor
+- Sin asesor visible: asignación automática
 
-## Imagen de fondo
-URL: [https://url-de-la-imagen.jpg]
+## Qué se cotiza
+[Describir el tipo de producto o servicio]
+[Indicar si los productos se filtran por pricingList, category, o ambos]
 
-## APIs a consumir
+## Agentes
+[Qué roles tienen los asesores en Prolibu: agent, admin, etc.]
+[Si el asesor es visible para el usuario o se asigna automáticamente]
 
-### 1. Cargar agentes
-GET https://${domain}/v1/publicservices/getAgents
-Params: { status: 'active', roles: ['agent'] }
-Sin Authorization header.
-Filtrar por: department === departmentFilter
-Campos a mapear del objeto agente:
-- email → identificador del asesor
-- firstName / firstname → nombre
-- lastName / lastname → apellido
-- [indicar qué campo contiene la ciudad del asesor]
-- [indicar qué campo contiene la vitrina del asesor]
-
-### 2. Cargar productos
-GET https://${domain}/v1/product
-Params: { limit: 1000 }
-Authorization: Bearer ${bearerToken}
-Filtrar por: pricingList contiene pricingListFilter
-Campos a usar: sku (id del producto), name (nombre a mostrar), disabled
-
-### 3. Captcha
-Cargar como <embed> en el formulario:
-https://${domain}/v1/ConfirmationCode/?color=white&noise=2&size=4
-
-### 4. Validar captcha
-nodriza.api.confirmationCode.confirm({ code }, callback)
-Si válido → callback recibe results.hash → incluirlo en la propuesta
-
-### 5. Generar propuesta
-nodriza.api.proposalbot.generate(options, callback)
-options incluye: chatbot, to (firstName, lastName, mobile, email, agent),
-doc (title, products[{id:sku, quantity:1}], status:'Ready', currency,
-metadata con webhook/pipeline/dealstage/customAttributes, dic:{hash})
-Si exitoso → redirigir a WhatsApp con res.url
-
-## Lógica de asignación de asesores
-Usar balanceo round-robin:
-- Filtrar agentsList por ciudad y vitrina seleccionada
-- Rotar con currentAgentIndex % filtered.length
-- currentAgentIndex inicia en Math.floor(Math.random() * 1000)
+## Recurso de fondo
+[URL de imagen o video de fondo]
 
 ## Flujo del formulario
-1. Al cargar: llamar loadAgents() y loadProducts() en paralelo
-2. Select de modelo: populated con getSelectedProducts() usando Select2
-3. Select de ciudad: opciones fijas definidas arriba
-4. Al cambiar ciudad: mostrar select de vitrina con vitrinas disponibles para esa ciudad
-5. Campos de datos: nombres, apellidos, celular (con intl-tel-input, país inicial: co), email
-6. Captcha: embed + input para ingresar el código
-7. Checkboxes: autorización de datos (requerido) y promociones (opcional)
-8. Submit: validar → confirmar captcha → createProposal → WhatsApp
+1. Al cargar: consultar agentes, productos y categorías en paralelo
+2. Selectores de categoría (si aplica) → al cambiar, actualizar select de modelos
+3. Select de modelo con Select2
+4. Campos: nombre, apellido, celular (intl-tel-input, país inicial: co), email
+5. Captcha: embed desde /v1/ConfirmationCode/?color=white&noise=2&size=4 + input
+6. Checkbox de autorización (requerido) y promociones (opcional)
+7. Submit → validar captcha → POST /v1/proposalbot/generate → redirigir a WhatsApp
 
 ## Diseño
-[Describir el estilo que quieres. Ejemplo:]
-- Fondo oscuro negro #07080a
-- Acento en color [color] — [hex]
-- Layout: imagen a pantalla completa arriba, formulario horizontal abajo
-- Tipografía: [nombre de fuente de Google Fonts]
-- Campos en fila de [N] columnas en desktop, [N] en mobile
+[Color de fondo o URL de recurso visual]
+[Color de acento — hex]
+[Fuente de Google Fonts]
+[Columnas en desktop / mobile]
 
-## Contenedor en la plataforma
-El HTML del bot se inyectará dentro de <div id="bot-[cliente]">.
-NO usar document.write. NO depender de que el DOM de la página tenga
-elementos específicos fuera del contenedor.
-
-## Resultado esperado
-Un único archivo .html que contenga todo (CSS, HTML, JS).
-Sin dependencias externas adicionales a las listadas.
-El archivo debe funcionar cuando sea cargado dinámicamente via fetch
-e inyectado en el DOM por el loader.js.
+## Importante
+- El HTML se inyecta dentro de <div id="bot-[cliente]">
+- NO usar document.write
+- Todo en un solo archivo .html (CSS + HTML + JS)
+- No depender de elementos del DOM fuera del contenedor
+- El endpoint de propuesta es POST /v1/proposalbot/generate (via nodriza.api.proposalbot.generate)
 ````
-
-> **Tip:** mientras más detallado sea el mapeo de campos de agentes y el diseño, mejor será el resultado. Si no conoces la estructura exacta del objeto agente, ejecuta primero la API y revisa la respuesta en F12 → Network.
