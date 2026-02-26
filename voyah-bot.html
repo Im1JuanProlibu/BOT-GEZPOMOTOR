@@ -5,7 +5,7 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
 <link
-  href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800&family=Barlow:wght@300;400;500;600&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
   rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
 <script src="https://s3.amazonaws.com/cdn.nodriza.io/sdk/nodriza@lastest/nodriza-sdk.bundle.js"></script>
@@ -15,16 +15,18 @@
 
 <style>
   :root {
-    --v-bg: #07080a;
-    --v-panel: #0d0f13;
-    --v-accent: #2ecc8a;
-    --v-accent2: #7eedc0;
-    --v-accentdim: rgba(46, 204, 138, 0.12);
-    --v-accentbrd: rgba(46, 204, 138, 0.3);
-    --v-white: #f0ede8;
-    --v-muted: rgba(240, 237, 232, 0.45);
-    --v-inputbg: rgba(255, 255, 255, 0.03);
-    --v-inputbrd: rgba(255, 255, 255, 0.07);
+    --bg: #020b18;
+    --bg2: #041022;
+    --glass: rgba(4, 20, 48, 0.7);
+    --glassbd: rgba(0, 162, 255, 0.15);
+    --cyan: #00c8ff;
+    --cyan2: #7de8ff;
+    --cyandim: rgba(0, 200, 255, 0.1);
+    --cyanbrd: rgba(0, 200, 255, 0.2);
+    --white: #e8f4ff;
+    --muted: rgba(232, 244, 255, 0.4);
+    --inputbg: rgba(0, 162, 255, 0.04);
+    --inputbrd: rgba(0, 162, 255, 0.12);
     --ease: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -37,14 +39,40 @@
   }
 
   #chatbot-automotriz * {
-    font-family: 'Barlow', sans-serif !important;
+    font-family: 'Space Grotesk', sans-serif !important;
   }
 
   #chatbot-automotriz {
-    overflow: visible;
-    background: var(--v-bg);
+    background: var(--bg);
     min-height: 100vh;
+    overflow: visible;
     position: relative;
+  }
+
+  /* ══ FONDO ANIMADO ══ */
+  #chatbot-automotriz::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 50%, rgba(0, 100, 200, 0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 20%, rgba(0, 50, 150, 0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 50% 80%, rgba(0, 200, 255, 0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Grid lines decorativas */
+  #chatbot-automotriz::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0, 162, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 162, 255, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
   }
 
   #chatbot-automotriz .row {
@@ -53,37 +81,26 @@
     z-index: 1;
   }
 
-  /* LOGO MOBILE */
+  /* ══ LOGO MOBILE ══ */
   #logo-container {
-    background: var(--v-panel);
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--v-accentbrd);
+    background: var(--bg2);
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--cyanbrd);
     position: relative;
-    overflow: hidden;
-  }
-
-  #logo-container::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--v-accent), transparent);
   }
 
   #logo-container .brand-name {
-    font-family: 'Barlow Condensed', sans-serif !important;
-    font-weight: 800 !important;
-    font-size: 1.3rem !important;
-    letter-spacing: 0.25em;
+    font-family: 'Space Mono', monospace !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: var(--v-accent) !important;
+    color: var(--cyan) !important;
   }
 
-  /* IMAGEN MOBILE */
+  /* ══ IMAGEN MOBILE ══ */
   #image-selecte-mobile {
-    height: 260px;
+    height: 280px;
     background-size: cover;
     background-position: center 30%;
     position: relative;
@@ -93,10 +110,10 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, rgba(7, 8, 10, 0.1) 0%, rgba(7, 8, 10, 0.95) 100%);
+    background: linear-gradient(to bottom, transparent 20%, var(--bg) 100%);
   }
 
-  /* IMAGEN FONDO */
+  /* ══ FONDO IMAGEN ══ */
   #chatbot-automotriz #background {
     background-position: center 35%;
     background-size: cover;
@@ -108,269 +125,218 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(100deg, rgba(7, 8, 10, 0) 0%, rgba(7, 8, 10, 0.2) 50%, rgba(7, 8, 10, 0.92) 100%);
+    background: linear-gradient(110deg,
+        rgba(2, 11, 24, 0) 0%,
+        rgba(2, 11, 24, 0.3) 55%,
+        rgba(2, 11, 24, 0.97) 100%);
   }
 
-  /* PANEL DERECHO */
+  /* ══ PANEL FORMULARIO — GLASSMORPHISM ══ */
   #contact-form {
-    background: var(--v-panel) !important;
+    background: var(--glass) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    border-left: 1px solid var(--glassbd) !important;
     padding: 0 !important;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    border-left: 1px solid var(--v-accentbrd);
     position: relative;
     overflow: hidden;
   }
 
+  /* Línea cyan top */
   #contact-form::before {
     content: '';
     display: block;
     width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent 0%, var(--v-accent) 40%, var(--v-accent2) 60%, transparent 100%);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--cyan2), transparent);
+    box-shadow: 0 0 20px rgba(0, 200, 255, 0.5);
     flex-shrink: 0;
   }
 
+  /* Orbe de luz */
   #contact-form::after {
     content: '';
     position: absolute;
-    top: -120px;
-    right: -120px;
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(circle, rgba(232, 197, 90, 0.07) 0%, transparent 70%);
+    top: -200px;
+    right: -200px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(0, 200, 255, 0.06) 0%, transparent 65%);
     pointer-events: none;
   }
 
   #info-container {
-    padding: 28px 32px 40px;
+    padding: 32px 32px 44px;
     flex: 1;
     overflow-y: auto;
-    animation: slideUp 0.5s var(--ease) both;
   }
 
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes pulse {
-
-    0%,
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    50% {
-      opacity: 0.5;
-      transform: scale(0.8);
-    }
-  }
-
-  /* BADGE */
-  .voyah-badge {
-    display: inline-flex;
+  /* ══ NÚMERO DECORATIVO ══ */
+  .form-step-header {
+    display: flex;
     align-items: center;
-    gap: 6px;
-    background: var(--v-accentdim);
-    border: 1px solid var(--v-accentbrd);
-    border-radius: 2px;
-    padding: 4px 10px;
-    margin-bottom: 14px;
+    gap: 16px;
+    margin-bottom: 28px;
   }
 
-  .voyah-badge span {
-    font-family: 'Barlow Condensed', sans-serif !important;
-    font-size: 0.65rem !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--v-accent) !important;
-  }
-
-  .voyah-badge::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    background: var(--v-accent);
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-
-  /* ENCABEZADO */
-  #info-container>.row:first-child {
-    margin-bottom: 28px !important;
-  }
-
-  #info-container h3,
-  #info-container h5 {
-    font-family: 'Barlow Condensed', sans-serif !important;
+  .step-num {
+    font-family: 'Space Mono', monospace !important;
+    font-size: 3rem !important;
     font-weight: 700 !important;
-    letter-spacing: 0.04em;
-    line-height: 1.2;
-    color: var(--v-white) !important;
-    text-transform: uppercase;
-    position: relative;
-    padding-bottom: 12px;
+    color: rgba(0, 200, 255, 0.12) !important;
+    line-height: 1;
+    letter-spacing: -0.04em;
   }
 
-  #info-container h3 {
-    font-size: 1.25rem !important;
+  .step-title {
+    flex: 1;
   }
 
-  #info-container h5 {
+  .step-title h3,
+  .step-title h5 {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 700 !important;
+    color: var(--white) !important;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+  }
+
+  .step-title h3 {
+    font-size: 1.2rem !important;
+  }
+
+  .step-title h5 {
     font-size: 1rem !important;
   }
 
-  #info-container h3::after,
-  #info-container h5::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 36px;
-    height: 2px;
-    background: var(--v-accent);
+  .step-subtitle {
+    font-size: 0.75rem !important;
+    color: var(--muted) !important;
+    margin-top: 4px;
+    font-weight: 400 !important;
+    letter-spacing: 0.03em;
   }
 
-  /* LABELS */
+  /* ══ LABELS ══ */
   #info-container h4,
   #info-container h6 {
-    font-family: 'Barlow Condensed', sans-serif !important;
-    font-size: 0.68rem !important;
-    font-weight: 600 !important;
+    font-family: 'Space Mono', monospace !important;
+    font-size: 0.6rem !important;
+    font-weight: 700 !important;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--v-accent) !important;
+    color: var(--cyan) !important;
     margin: 20px 0 8px !important;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    opacity: 0.8;
   }
 
-  #info-container h4::before,
-  #info-container h6::before {
-    content: '';
-    width: 4px;
-    height: 4px;
-    background: var(--v-accent);
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  #info-container h4::after,
-  #info-container h6::after {
-    content: '';
-    flex: 1;
+  /* ══ SEPARADOR ══ */
+  .form-divider {
     height: 1px;
-    background: linear-gradient(90deg, var(--v-accentbrd), transparent);
+    background: linear-gradient(90deg, var(--cyanbrd), transparent);
+    margin: 4px 0 16px;
   }
 
-  /* INPUTS */
+  /* ══ INPUTS ══ */
   #contact-form .form-group {
     margin-bottom: 10px !important;
   }
 
   #contact-form .form-control {
-    background: var(--v-inputbg) !important;
-    border: 1px solid var(--v-inputbrd) !important;
-    border-radius: 3px !important;
-    color: var(--v-white) !important;
+    background: var(--inputbg) !important;
+    border: 1px solid var(--inputbrd) !important;
+    border-radius: 6px !important;
+    color: var(--white) !important;
     font-size: 0.875rem !important;
     font-weight: 400 !important;
-    padding: 11px 14px !important;
+    padding: 12px 16px !important;
     height: auto !important;
-    transition: all 0.25s var(--ease) !important;
-    letter-spacing: 0.02em;
+    transition: all 0.2s var(--ease) !important;
+    letter-spacing: 0.01em;
   }
 
   #contact-form .form-control:focus {
-    border-color: var(--v-accent) !important;
-    background: rgba(232, 197, 90, 0.04) !important;
-    box-shadow: 0 0 0 3px rgba(46, 204, 138, 0.08) !important;
+    border-color: var(--cyan) !important;
+    background: rgba(0, 200, 255, 0.06) !important;
+    box-shadow: 0 0 0 3px rgba(0, 200, 255, 0.08), 0 0 20px rgba(0, 200, 255, 0.06) !important;
     outline: none !important;
   }
 
   #contact-form .form-control::placeholder {
-    color: rgba(240, 237, 232, 0.2) !important;
+    color: rgba(232, 244, 255, 0.2) !important;
     font-weight: 300 !important;
   }
 
-  /* SELECT2 */
+  /* ══ SELECT2 ══ */
   .select2-container--default .select2-selection--single {
-    background: var(--v-inputbg) !important;
-    border: 1px solid var(--v-inputbrd) !important;
-    border-radius: 3px !important;
-    height: 42px !important;
+    background: var(--inputbg) !important;
+    border: 1px solid var(--inputbrd) !important;
+    border-radius: 6px !important;
+    height: 44px !important;
     display: flex !important;
     align-items: center !important;
-    padding-left: 14px !important;
-    transition: all 0.25s var(--ease) !important;
+    padding-left: 16px !important;
+    transition: all 0.2s var(--ease) !important;
   }
 
   .select2-container--default.select2-container--open .select2-selection--single {
-    border-color: var(--v-accent) !important;
+    border-color: var(--cyan) !important;
+    box-shadow: 0 0 0 3px rgba(0, 200, 255, 0.08) !important;
   }
 
   .select2-container--default .select2-selection--single .select2-selection__rendered {
-    color: var(--v-white) !important;
+    color: var(--white) !important;
     font-size: 0.875rem !important;
-    line-height: 42px !important;
+    line-height: 44px !important;
     padding: 0 !important;
   }
 
   .select2-container--default .select2-selection--single .select2-selection__placeholder {
-    color: rgba(240, 237, 232, 0.2) !important;
+    color: rgba(232, 244, 255, 0.2) !important;
     font-weight: 300 !important;
   }
 
   .select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 40px !important;
+    height: 42px !important;
     right: 12px !important;
   }
 
   .select2-container--default .select2-selection--single .select2-selection__arrow b {
-    border-color: rgba(240, 237, 232, 0.3) transparent transparent !important;
+    border-color: rgba(0, 200, 255, 0.4) transparent transparent !important;
   }
 
   .select2-dropdown {
-    background: #0f1117 !important;
-    border: 1px solid var(--v-accentbrd) !important;
-    border-radius: 3px !important;
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6) !important;
+    background: #041430 !important;
+    border: 1px solid var(--cyanbrd) !important;
+    border-radius: 6px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 200, 255, 0.05) !important;
   }
 
   .select2-container--default .select2-results__option {
-    color: rgba(240, 237, 232, 0.65) !important;
+    color: rgba(232, 244, 255, 0.6) !important;
     font-size: 0.85rem !important;
-    padding: 10px 14px !important;
+    padding: 10px 16px !important;
   }
 
   .select2-container--default .select2-results__option--highlighted[aria-selected] {
-    background: var(--v-accentdim) !important;
-    color: var(--v-accent2) !important;
+    background: var(--cyandim) !important;
+    color: var(--cyan2) !important;
   }
 
   .select2-container--default .select2-results__option[aria-selected=true] {
-    background: rgba(46, 204, 138, 0.08) !important;
-    color: var(--v-accent) !important;
+    background: rgba(0, 200, 255, 0.08) !important;
+    color: var(--cyan) !important;
   }
 
   .select2-search--dropdown .select2-search__field {
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid var(--v-accentbrd) !important;
-    color: var(--v-white) !important;
-    border-radius: 2px !important;
-    padding: 7px 10px !important;
+    background: rgba(0, 162, 255, 0.06) !important;
+    border: 1px solid var(--cyanbrd) !important;
+    color: var(--white) !important;
+    border-radius: 4px !important;
+    padding: 8px 12px !important;
     font-size: 0.84rem !important;
   }
 
@@ -378,25 +344,25 @@
     width: 100% !important;
   }
 
-  /* TELÉFONO */
+  /* ══ TELÉFONO ══ */
   .iti {
     width: 100%;
   }
 
   .form-group input[type="tel"] {
-    padding-left: 68px !important;
+    padding-left: 72px !important;
   }
 
   .iti__selected-flag {
     background: transparent !important;
-    border-right: 1px solid var(--v-inputbrd) !important;
+    border-right: 1px solid var(--inputbrd) !important;
     padding: 0 12px !important;
   }
 
   .iti__selected-dial-code {
-    color: var(--v-accent) !important;
+    color: var(--cyan) !important;
     font-size: 0.82rem !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
   }
 
   .iti__flag-container {
@@ -405,11 +371,11 @@
   }
 
   .iti__country-list {
-    background-color: #0f1117 !important;
-    background: #0f1117 !important;
-    border: 1px solid var(--v-accentbrd) !important;
-    border-radius: 3px !important;
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7) !important;
+    background-color: #041430 !important;
+    background: #041430 !important;
+    border: 1px solid var(--cyanbrd) !important;
+    border-radius: 6px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8) !important;
     z-index: 9999 !important;
     max-height: 220px !important;
   }
@@ -417,21 +383,21 @@
   .iti__country-list .iti__country,
   .iti__country-list li.iti__country {
     background-color: transparent !important;
-    color: rgba(240, 237, 232, 0.65) !important;
+    color: rgba(232, 244, 255, 0.6) !important;
     padding: 8px 12px !important;
     font-size: 0.82rem !important;
   }
 
   .iti__country-list .iti__country:hover,
   .iti__country-list li.iti__country:hover {
-    background-color: var(--v-accentdim) !important;
-    color: var(--v-accent2) !important;
+    background-color: var(--cyandim) !important;
+    color: var(--cyan2) !important;
   }
 
   .iti__country-list .iti__highlight,
   .iti__country-list li.iti__highlight {
-    background-color: rgba(46, 204, 138, 0.1) !important;
-    color: var(--v-accent) !important;
+    background-color: rgba(0, 200, 255, 0.1) !important;
+    color: var(--cyan) !important;
   }
 
   .iti__country-name {
@@ -439,20 +405,20 @@
   }
 
   .iti__dial-code {
-    color: rgba(46, 204, 138, 0.6) !important;
+    color: rgba(0, 200, 255, 0.5) !important;
   }
 
   .iti__divider {
-    border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+    border-bottom-color: rgba(0, 162, 255, 0.1) !important;
   }
 
-  /* CHECKBOXES */
+  /* ══ CHECKBOXES ══ */
   #contact-form .form-group.checkbox {
     margin-bottom: 8px !important;
   }
 
   #contact-form .form-group.checkbox label {
-    color: var(--v-muted) !important;
+    color: var(--muted) !important;
     font-size: 0.72rem !important;
     line-height: 1.6;
     display: flex;
@@ -466,60 +432,61 @@
     height: 14px;
     flex-shrink: 0;
     margin-top: 3px;
-    accent-color: var(--v-accent);
+    accent-color: var(--cyan);
     cursor: pointer;
   }
 
   #contact-form .form-group.checkbox a {
-    color: var(--v-accent) !important;
+    color: var(--cyan) !important;
     text-decoration: none !important;
-    border-bottom: 1px solid rgba(232, 197, 90, 0.3);
+    border-bottom: 1px solid var(--cyanbrd);
   }
 
   #contact-form .form-group.checkbox a:hover {
-    color: var(--v-accent2) !important;
+    color: var(--cyan2) !important;
   }
 
-  /* BOTÓN */
+  /* ══ BOTÓN ══ */
   #submit-btn {
     width: 100%;
-    background: linear-gradient(135deg, #2ecc8a 0%, #1ea86e 50%, #0f7a4e 100%) !important;
-    color: #03120a !important;
-    border: none !important;
-    border-radius: 3px !important;
+    background: transparent !important;
+    color: var(--cyan) !important;
+    border: 1px solid var(--cyan) !important;
+    border-radius: 6px !important;
     padding: 14px 20px !important;
-    font-family: 'Barlow Condensed', sans-serif !important;
-    font-size: 1rem !important;
+    font-family: 'Space Mono', monospace !important;
+    font-size: 0.8rem !important;
     font-weight: 700 !important;
-    letter-spacing: 0.25em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     cursor: pointer;
     transition: all 0.3s var(--ease) !important;
     position: relative;
     overflow: hidden;
-    margin-top: 10px !important;
+    margin-top: 12px !important;
     height: auto !important;
-    box-shadow: 0 4px 20px rgba(46, 204, 138, 0.2) !important;
+    box-shadow: 0 0 20px rgba(0, 200, 255, 0.1), inset 0 0 20px rgba(0, 200, 255, 0.03) !important;
   }
 
   #submit-btn::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s var(--ease);
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0, 200, 255, 0.15), rgba(0, 200, 255, 0.05));
+    opacity: 0;
+    transition: opacity 0.3s var(--ease);
   }
 
   #submit-btn:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 32px rgba(46, 204, 138, 0.35) !important;
+    background: rgba(0, 200, 255, 0.08) !important;
+    box-shadow: 0 0 40px rgba(0, 200, 255, 0.2), inset 0 0 20px rgba(0, 200, 255, 0.05) !important;
+    transform: translateY(-1px) !important;
+    color: var(--cyan2) !important;
+    border-color: var(--cyan2) !important;
   }
 
   #submit-btn:hover::before {
-    left: 100%;
+    opacity: 1;
   }
 
   #submit-btn:active {
@@ -530,25 +497,26 @@
     display: none;
   }
 
-  /* FOOTER */
+  /* ══ FOOTER ══ */
   #chatbot-automotriz footer {
-    background: var(--v-panel) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
-    padding: 14px 32px !important;
-    font-size: 0.68rem !important;
+    background: rgba(2, 11, 24, 0.8) !important;
+    border-top: 1px solid rgba(0, 162, 255, 0.08) !important;
+    padding: 16px 32px !important;
+    font-size: 0.65rem !important;
     opacity: 1 !important;
     position: relative;
     z-index: 1;
   }
 
   #chatbot-automotriz footer p {
-    color: rgba(240, 237, 232, 0.2) !important;
-    letter-spacing: 0.08em;
+    color: rgba(232, 244, 255, 0.15) !important;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
+    font-family: 'Space Mono', monospace !important;
     margin: 0;
   }
 
-  /* SCROLLBAR */
+  /* ══ SCROLLBAR ══ */
   #info-container::-webkit-scrollbar {
     width: 3px;
   }
@@ -558,53 +526,126 @@
   }
 
   #info-container::-webkit-scrollbar-thumb {
-    background: var(--v-accentbrd);
+    background: var(--cyanbrd);
     border-radius: 2px;
   }
 
-  /* ANIMACIONES CAMPOS */
+  /* ══ ANIMACIONES ══ */
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scanline {
+    from {
+      transform: translateY(-100%);
+    }
+
+    to {
+      transform: translateY(100vh);
+    }
+  }
+
+  @keyframes blink {
+
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0;
+    }
+  }
+
+  #info-container {
+    animation: fadeUp 0.6s var(--ease) both;
+  }
+
   #contact-form .form-group {
-    animation: slideUp 0.4s var(--ease) both;
+    animation: fadeUp 0.4s var(--ease) both;
   }
 
   #contact-form .form-group:nth-child(1) {
-    animation-delay: 0.05s;
+    animation-delay: 0.06s;
   }
 
   #contact-form .form-group:nth-child(2) {
-    animation-delay: 0.10s;
+    animation-delay: 0.12s;
   }
 
   #contact-form .form-group:nth-child(3) {
-    animation-delay: 0.15s;
+    animation-delay: 0.18s;
   }
 
   #contact-form .form-group:nth-child(4) {
-    animation-delay: 0.20s;
+    animation-delay: 0.24s;
   }
 
   #contact-form .form-group:nth-child(5) {
-    animation-delay: 0.25s;
-  }
-
-  #contact-form .form-group:nth-child(6) {
     animation-delay: 0.30s;
   }
 
+  #contact-form .form-group:nth-child(6) {
+    animation-delay: 0.36s;
+  }
+
   #contact-form .form-group:nth-child(7) {
-    animation-delay: 0.35s;
+    animation-delay: 0.42s;
   }
 
   #contact-form .form-group:nth-child(8) {
-    animation-delay: 0.40s;
+    animation-delay: 0.48s;
   }
 
   #contact-form .form-group:nth-child(9) {
-    animation-delay: 0.45s;
+    animation-delay: 0.54s;
   }
 
   #contact-form .form-group:nth-child(10) {
-    animation-delay: 0.50s;
+    animation-delay: 0.60s;
+  }
+
+  /* ══ STATUS INDICATOR ══ */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding: 8px 12px;
+    background: rgba(0, 200, 255, 0.05);
+    border: 1px solid rgba(0, 200, 255, 0.1);
+    border-radius: 4px;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    background: #00ff88;
+    border-radius: 50%;
+    animation: blink 2s infinite;
+    box-shadow: 0 0 8px #00ff88;
+  }
+
+  .status-text {
+    font-family: 'Space Mono', monospace !important;
+    font-size: 0.6rem !important;
+    color: rgba(0, 200, 255, 0.6) !important;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 400 !important;
+  }
+
+  .status-text b {
+    color: var(--cyan) !important;
+    font-weight: 700 !important;
   }
 </style>
 
@@ -804,7 +845,7 @@
 <div id="chatbot-automotriz">
   <div id="logo-container" class="d-md-none">
     <div class="row">
-      <div class="col-8 brand-name">Cotizador Voyah</div>
+      <div class="col-8 brand-name">VOYAH_MOTOR</div>
       <div class="col-4 padding-right text-right"></div>
     </div>
   </div>
@@ -819,28 +860,33 @@
     <form id="contact-form" class="col col-12 col-sm-12 col-md-6 col-xl-4" onsubmit="return submitForm(event);">
       <div id="info-container">
 
-        <div class="voyah-badge"><span>Cotización Inmediata</span></div>
+        <div class="status-bar">
+          <div class="status-dot"></div>
+          <span class="status-text">Sistema activo — <b>Cotización en tiempo real</b></span>
+        </div>
 
-        <div class="row">
-          <div class="col-12 padding-right">
-            <h3 class="d-none d-lg-block">Recibe tu propuesta comercial al instante</h3>
-            <h5 class="d-md-none">Recibe tu propuesta comercial al instante</h5>
+        <div class="form-step-header">
+          <span class="step-num">01</span>
+          <div class="step-title">
+            <h3 class="d-none d-lg-block">Configura tu Voyah</h3>
+            <h5 class="d-md-none">Configura tu Voyah</h5>
+            <p class="step-subtitle">Selecciona modelo, ciudad y vitrina</p>
           </div>
         </div>
 
-        <div class="row" style="margin-top: 6px !important;">
+        <div class="row">
           <fieldset class="col-12 padding-right" style="border:none; padding-left:0; padding-right:0;">
 
-            <h4 class="d-none d-lg-block">Vehículo</h4>
-            <h6 class="d-lg-none">Vehículo</h6>
+            <h4 class="d-none d-lg-block">// Modelo</h4>
+            <h6 class="d-lg-none">// Modelo</h6>
             <div class="form-group">
               <select class="form-control" name="model" id="model" required="">
                 <option value="">Cargando modelos...</option>
               </select>
             </div>
 
-            <h4 class="d-none d-lg-block">Ubicación</h4>
-            <h6 class="d-lg-none">Ubicación</h6>
+            <h4 class="d-none d-lg-block">// Ciudad</h4>
+            <h6 class="d-lg-none">// Ciudad</h6>
             <div class="form-group">
               <select class="form-control" name="ciudad" id="ciudad" required="">
                 <option value="">Seleccione una ciudad</option>
@@ -851,8 +897,8 @@
             </div>
 
             <div id="vitrina-container">
-              <h4 class="d-none d-lg-block">Vitrina</h4>
-              <h6 class="d-lg-none">Vitrina</h6>
+              <h4 class="d-none d-lg-block">// Vitrina</h4>
+              <h6 class="d-lg-none">// Vitrina</h6>
               <div class="form-group">
                 <select class="form-control" name="vitrina" id="vitrina">
                   <option value="">Seleccione una vitrina</option>
@@ -860,8 +906,16 @@
               </div>
             </div>
 
-            <h4 class="d-none d-lg-block">Sus Datos</h4>
-            <h6 class="d-lg-none">Sus Datos</h6>
+            <div class="form-divider"></div>
+
+            <div class="form-step-header" style="margin-top:8px; margin-bottom:16px;">
+              <span class="step-num">02</span>
+              <div class="step-title">
+                <h3 class="d-none d-lg-block" style="font-size:1rem !important;">Tus datos de contacto</h3>
+                <h5 class="d-md-none" style="font-size:0.9rem !important;">Tus datos de contacto</h5>
+              </div>
+            </div>
+
             <div class="form-group">
               <input class="form-control" type="text" name="firstName" id="firstName" placeholder="Nombres" required="">
             </div>
@@ -875,17 +929,21 @@
               <input class="form-control" type="email" name="email" id="email" placeholder="Correo electrónico"
                 required="">
             </div>
+
+            <div class="form-divider"></div>
+
             <div class="form-group">
               <p id="confirmation-container"></p>
             </div>
             <div class="form-group">
-              <input class="form-control" type="text" name="code" id="code" placeholder="Código de verificación"
+              <input class="form-control" type="text" name="code" id="code" placeholder="_ _ _ _ código de verificación"
                 required="">
             </div>
+
             <div class="form-group checkbox">
               <label for="promotions">
                 <input type="checkbox" name="promotions" id="promotions" checked="">
-                Autorizo recibir información sobre promociones, eventos y descuentos.
+                Autorizo recibir información sobre promociones y eventos.
               </label>
             </div>
             <div class="form-group checkbox">
@@ -894,8 +952,9 @@
                 Acepto la <a href="#" target="_blank">política de tratamiento de datos</a>
               </label>
             </div>
+
             <div class="form-group">
-              <input class="form-control btn btn-primary" id="submit-btn" type="submit" value="OBTENER COTIZACIÓN →">
+              <input class="form-control btn btn-primary" id="submit-btn" type="submit" value="[ GENERAR COTIZACIÓN ]">
             </div>
 
           </fieldset>
@@ -905,6 +964,6 @@
   </div>
 
   <footer class="row" style="padding-left:0;">
-    <p id="copyright">©2025 GezpoMotor · Todos los derechos reservados</p>
+    <p id="copyright">© 2025 GEZPOMOTOR — ALL RIGHTS RESERVED</p>
   </footer>
 </div>
